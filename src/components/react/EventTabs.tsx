@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Tab {
   slug: string;
@@ -90,6 +90,21 @@ const tabIcons: Record<string, string> = {
 export default function EventTabs({ tabs }: EventTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeTab = tabs[activeIndex];
+
+  // Listen for nav link clicks to switch tabs
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement).closest("[data-tab]");
+      if (target) {
+        const idx = parseInt(target.getAttribute("data-tab") || "0", 10);
+        if (idx >= 0 && idx < tabs.length) {
+          setActiveIndex(idx);
+        }
+      }
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [tabs.length]);
 
   if (!activeTab) return null;
 
