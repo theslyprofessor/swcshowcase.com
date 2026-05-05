@@ -72,20 +72,21 @@ function renderMarkdown(md: string): string {
 
 const tabIcons: Record<string, string> = {
   "Overview": "🎭",
-  "Schedule": "📋",
+  "Tickets": "🎟️",
   "Attend": "🎟️",
+  "Schedule": "📋",
   "Performer Info": "🎸",
   "Volunteer": "🤝",
   "Food & Venue": "📍",
 };
 
 // ---------------------------------------------------------------------------
-// Component — content on left, nav sidebar on right (mobile: hamburger drawer)
+// Top horizontal section nav, right-aligned. Content below.
+// Mobile: nav scrolls horizontally.
 // ---------------------------------------------------------------------------
 
 export default function EventTabs({ tabs }: EventTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const activeTab = tabs[activeIndex];
 
   useEffect(() => {
@@ -95,7 +96,6 @@ export default function EventTabs({ tabs }: EventTabsProps) {
         const idx = parseInt(target.getAttribute("data-tab") || "0", 10);
         if (idx >= 0 && idx < tabs.length) {
           setActiveIndex(idx);
-          setMobileNavOpen(false);
         }
       }
     };
@@ -105,91 +105,47 @@ export default function EventTabs({ tabs }: EventTabsProps) {
 
   if (!activeTab) return null;
 
-  const navList = (
-    <ul className="space-y-1">
-      {tabs.map((tab, i) => {
-        const isActive = i === activeIndex;
-        const icon = tabIcons[tab.label] || "📄";
-        return (
-          <li key={tab.slug}>
-            <button
-              onClick={() => {
-                setActiveIndex(i);
-                setMobileNavOpen(false);
-              }}
-              className={`
-                w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left
-                text-base font-medium transition-all
-                ${isActive
-                  ? "bg-primary/10 text-primary border-l-2 border-primary"
-                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground border-l-2 border-transparent"
-                }
-              `}
-            >
-              <span className="text-xl">{icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-
   return (
-    <div className="relative">
-      {/* Mobile hamburger — fixed top-right on small screens */}
-      <button
-        onClick={() => setMobileNavOpen(true)}
-        className="lg:hidden fixed top-3 right-3 z-40 bg-card border border-border rounded-lg p-2.5 shadow-lg"
-        aria-label="Open event sections"
-      >
-        <svg className="h-6 w-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
-
-      {/* Mobile drawer */}
-      {mobileNavOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div
-            className="flex-1 bg-background/80 backdrop-blur-sm"
-            onClick={() => setMobileNavOpen(false)}
-          />
-          <div className="w-72 max-w-[85vw] bg-card border-l border-border p-4 overflow-y-auto">
-            <div className="flex items-center justify-between mb-4 px-2">
-              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Sections</span>
-              <button
-                onClick={() => setMobileNavOpen(false)}
-                aria-label="Close menu"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            {navList}
-          </div>
+    <div>
+      {/* Top section nav — right-aligned on desktop, horizontal scroll on mobile */}
+      <div className="border-b border-border mb-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-end overflow-x-auto scrollbar-hide -mb-px">
+          <nav className="flex gap-1 sm:gap-2">
+            {tabs.map((tab, i) => {
+              const isActive = i === activeIndex;
+              const icon = tabIcons[tab.label] || "📄";
+              return (
+                <button
+                  key={tab.slug}
+                  onClick={() => setActiveIndex(i)}
+                  className={`
+                    flex items-center gap-2 px-3 sm:px-4 py-3 text-sm font-medium
+                    transition-all relative whitespace-nowrap shrink-0
+                    ${isActive
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                    }
+                  `}
+                >
+                  <span className="text-base">{icon}</span>
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
         </div>
-      )}
+      </div>
 
-      {/* Desktop layout — content + sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-10 min-h-[60vh]">
-        <main className="order-2 lg:order-1">
-          <div className="prose-event max-w-3xl">
-            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-              <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
-              {activeTab.title}
-            </h2>
-            <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
-          </div>
-        </main>
-        <aside className="order-1 lg:order-2 hidden lg:block">
-          <div className="sticky top-24">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3 px-4">Sections</p>
-            {navList}
-          </div>
-        </aside>
+      {/* Content */}
+      <div className="prose-event max-w-3xl min-h-[50vh]">
+        <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+          <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
+          {activeTab.title}
+        </h2>
+        <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
       </div>
     </div>
   );
