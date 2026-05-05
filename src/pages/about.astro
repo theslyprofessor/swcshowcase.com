@@ -1,0 +1,138 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="About — SWC Media Showcase"
+  description="The Media Showcase is presented by Southwestern College's Recording Arts & Technology and Film, Television & Media Arts programs."
+>
+  {/* Header */}
+  <header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-2 font-bold text-sm">
+          <span class="gradient-text">SWC</span>
+          <span class="text-foreground">Media Showcase</span>
+        </a>
+        <div class="flex items-center gap-5 text-sm">
+          <a href="/" class="text-muted-foreground hover:text-foreground transition-colors">Submit</a>
+          <a href="/event" class="text-muted-foreground hover:text-foreground transition-colors">Event Info</a>
+          <a href="/about" class="text-foreground font-semibold transition-colors">About</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="pt-28 pb-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header */}
+      <div class="mb-12 max-w-3xl">
+        <p class="text-primary font-bold tracking-wider uppercase text-base mb-2">About</p>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-6">
+          <span class="gradient-text">Two programs,</span>
+          <span class="text-foreground"> one stage.</span>
+        </h1>
+        <p class="text-lg text-muted-foreground leading-relaxed">
+          The Media Showcase is the annual student work celebration presented jointly
+          by Southwestern College's <strong class="text-foreground">Recording Arts &amp; Technology (RA&amp;T)</strong>
+          and <strong class="text-foreground">Film, Television &amp; Media Arts (FTMA)</strong> programs.
+          Audio engineers, music producers, electronic composers, filmmakers, and media
+          artists share what they've made — live, in front of an audience that includes
+          their families, faculty, and the broader San Diego community.
+        </p>
+      </div>
+
+      {/* Program cards */}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <a
+          href="https://southwesternrecording.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group bg-card border border-border rounded-2xl p-8 hover:border-primary/40 transition-colors"
+        >
+          <p class="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+            Recording Side
+          </p>
+          <h2 class="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
+            Recording Arts &amp; Technology
+          </h2>
+          <p class="text-muted-foreground mb-5 leading-relaxed">
+            Audio engineering, music production, electronic composition, studio operation,
+            and sound for picture. Two years of hands-on work in our professional control
+            rooms and studios.
+          </p>
+          <div class="text-sm font-medium text-primary group-hover:underline">
+            southwesternrecording.com →
+          </div>
+        </a>
+
+        <a
+          href="https://swcftma.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group bg-card border border-border rounded-2xl p-8 hover:border-primary/40 transition-colors"
+        >
+          <p class="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+            Film + Media Side
+          </p>
+          <h2 class="text-2xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">
+            Film, Television &amp; Media Arts
+          </h2>
+          <p class="text-muted-foreground mb-5 leading-relaxed">
+            Cinematography, editing, screenwriting, broadcast production, animation,
+            and emerging media. Sister program to RA&amp;T — many showcase projects are
+            collaborations across both.
+          </p>
+          <div class="text-sm font-medium text-primary group-hover:underline">
+            FTMA program site →
+          </div>
+        </a>
+      </div>
+
+      {/* Closing */}
+      <div class="bg-secondary/40 border border-border rounded-2xl p-8 max-w-3xl">
+        <h3 class="text-xl font-bold mb-3 text-foreground">Why this site exists</h3>
+        <p class="text-muted-foreground leading-relaxed mb-3">
+          The Media Showcase has been around for years, run on goodwill, sticky notes,
+          and last-minute Slack threads. swcshowcase.com is an attempt to give the event
+          a permanent home — a place where students can submit their work, audience members
+          can find logistics, and faculty can run the night without losing track of who's playing
+          what when.
+        </p>
+        <p class="text-muted-foreground leading-relaxed">
+          Built on the same Convex backend that powers the rest of our recording program tooling.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  {/* Footer */}
+  <footer class="border-t border-border py-8 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+        <div class="flex items-center gap-2">
+          <span>&copy; {new Date().getFullYear()} Southwestern College</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <a
+            href="https://southwesternrecording.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-foreground transition-colors"
+          >
+            southwesternrecording.com
+          </a>
+          <span>&middot;</span>
+          <a
+            href="https://instagram.com/swc.recordingarts"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-foreground transition-colors"
+          >
+            @swc.recordingarts
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>

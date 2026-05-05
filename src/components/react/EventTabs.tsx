@@ -70,10 +70,6 @@ function renderMarkdown(md: string): string {
   return result.join("\n");
 }
 
-// ---------------------------------------------------------------------------
-// Tab icons (mapped by label)
-// ---------------------------------------------------------------------------
-
 const tabIcons: Record<string, string> = {
   "Overview": "🎭",
   "Schedule": "📋",
@@ -84,14 +80,14 @@ const tabIcons: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// Component
+// Component — content on left, nav sidebar on right (mobile: hamburger drawer)
 // ---------------------------------------------------------------------------
 
 export default function EventTabs({ tabs }: EventTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const activeTab = tabs[activeIndex];
 
-  // Listen for nav link clicks to switch tabs
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("[data-tab]");
@@ -99,6 +95,7 @@ export default function EventTabs({ tabs }: EventTabsProps) {
         const idx = parseInt(target.getAttribute("data-tab") || "0", 10);
         if (idx >= 0 && idx < tabs.length) {
           setActiveIndex(idx);
+          setMobileNavOpen(false);
         }
       }
     };
@@ -108,44 +105,91 @@ export default function EventTabs({ tabs }: EventTabsProps) {
 
   if (!activeTab) return null;
 
-  return (
-    <div className="min-h-[50vh]">
-      {/* Tab Bar — horizontal scroll on mobile, clean row on desktop */}
-      <div className="border-b border-border">
-        <div className="flex overflow-x-auto scrollbar-hide -mb-px">
-          {tabs.map((tab, i) => {
-            const isActive = i === activeIndex;
-            const icon = tabIcons[tab.label] || "📄";
-            return (
-              <button
-                key={tab.slug}
-                onClick={() => setActiveIndex(i)}
-                className={`
-                  flex items-center gap-2 px-5 py-3.5 text-sm font-medium
-                  transition-all relative whitespace-nowrap shrink-0
-                  ${isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                  }
-                `}
-              >
-                <span className="text-base">{icon}</span>
-                {tab.label}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+  const navList = (
+    <ul className="space-y-1">
+      {tabs.map((tab, i) => {
+        const isActive = i === activeIndex;
+        const icon = tabIcons[tab.label] || "📄";
+        return (
+          <li key={tab.slug}>
+            <button
+              onClick={() => {
+                setActiveIndex(i);
+                setMobileNavOpen(false);
+              }}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left
+                text-base font-medium transition-all
+                ${isActive
+                  ? "bg-primary/10 text-primary border-l-2 border-primary"
+                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground border-l-2 border-transparent"
+                }
+              `}
+            >
+              <span className="text-xl">{icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
 
-      {/* Tab Content */}
-      <div className="py-8 max-w-3xl">
-        <div
-          className="prose-event"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }}
-        />
+  return (
+    <div className="relative">
+      {/* Mobile hamburger — fixed top-right on small screens */}
+      <button
+        onClick={() => setMobileNavOpen(true)}
+        className="lg:hidden fixed top-3 right-3 z-40 bg-card border border-border rounded-lg p-2.5 shadow-lg"
+        aria-label="Open event sections"
+      >
+        <svg className="h-6 w-6 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
+      {/* Mobile drawer */}
+      {mobileNavOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div
+            className="flex-1 bg-background/80 backdrop-blur-sm"
+            onClick={() => setMobileNavOpen(false)}
+          />
+          <div className="w-72 max-w-[85vw] bg-card border-l border-border p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 px-2">
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Sections</span>
+              <button
+                onClick={() => setMobileNavOpen(false)}
+                aria-label="Close menu"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {navList}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop layout — content + sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-10 min-h-[60vh]">
+        <main className="order-2 lg:order-1">
+          <div className="prose-event max-w-3xl">
+            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+              <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
+              {activeTab.title}
+            </h2>
+            <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
+          </div>
+        </main>
+        <aside className="order-1 lg:order-2 hidden lg:block">
+          <div className="sticky top-24">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3 px-4">Sections</p>
+            {navList}
+          </div>
+        </aside>
       </div>
     </div>
   );

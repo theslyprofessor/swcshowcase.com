@@ -1,9 +1,28 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import SubmissionForm from "@/components/react/SubmissionForm";
+import EventTabs from "@/components/react/EventTabs";
+import { fetchEventTabs } from "@/lib/convex";
+
+// ---------------------------------------------------------------------------
+// Build-time fetch from Convex (convex-content module)
+// ---------------------------------------------------------------------------
+const FOLDER_PATH = "Academic Resources/Events/Media Showcase 2026";
+
+let tabs: Awaited<ReturnType<typeof fetchEventTabs>> = [];
+let fetchError = "";
+
+try {
+  tabs = await fetchEventTabs(FOLDER_PATH);
+} catch (e) {
+  fetchError = e instanceof Error ? e.message : "Failed to load event content";
+  console.error("Convex fetch error:", fetchError);
+}
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="Event Info — Media Showcase 2026"
+  description="Full event details for the Media Showcase 2026 at Southwestern College."
+>
   {/* Header */}
   <header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
     <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,8 +32,8 @@ import SubmissionForm from "@/components/react/SubmissionForm";
           <span class="text-foreground">Media Showcase</span>
         </a>
         <div class="flex items-center gap-5 text-sm">
-          <a href="/" class="text-foreground font-semibold transition-colors">Submit</a>
-          <a href="/event" class="text-muted-foreground hover:text-foreground transition-colors">Event Info</a>
+          <a href="/" class="text-muted-foreground hover:text-foreground transition-colors">Submit</a>
+          <a href="/event" class="text-foreground font-semibold transition-colors">Event Info</a>
           <a href="/about" class="text-muted-foreground hover:text-foreground transition-colors">About</a>
         </div>
       </div>
@@ -22,11 +41,10 @@ import SubmissionForm from "@/components/react/SubmissionForm";
   </header>
 
   <main>
-    {/* Hero — large, three-line eyebrow, time included */}
-    <section class="gradient-hero pt-28 pb-16 sm:pt-36 sm:pb-20">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    {/* Hero */}
+    <section class="gradient-hero pt-28 pb-12 sm:pt-36 sm:pb-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl">
-          {/* Eyebrow — three stacked lines, generous size */}
           <div class="mb-8 space-y-1.5">
             <p class="text-primary font-bold tracking-wider uppercase text-base sm:text-lg">
               Southwestern College
@@ -45,7 +63,7 @@ import SubmissionForm from "@/components/react/SubmissionForm";
             <span class="text-muted-foreground font-light"> 2026</span>
           </h1>
 
-          <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-base sm:text-lg text-muted-foreground mb-10">
+          <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-base sm:text-lg text-muted-foreground mb-8">
             <div class="flex items-center gap-2.5">
               <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
@@ -67,29 +85,32 @@ import SubmissionForm from "@/components/react/SubmissionForm";
             </div>
           </div>
 
-          <p class="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl">
-            Submit your work for an evening celebrating student audio, music, film,
-            and media arts. <a href="/event" class="text-primary hover:underline font-medium">See full event info →</a>
-          </p>
+          <a
+            href="/"
+            class="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-7 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Submit Your Work
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>
 
-    {/* Form */}
-    <section class="bg-background py-16">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl mx-auto mb-10">
-          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
-            <span class="gradient-text">Submit</span>
-            <span class="text-foreground"> Your Work</span>
-          </h2>
-          <p class="text-muted-foreground">
-            Tell us what you'd like to present. Space is limited — earlier submissions
-            get priority slot consideration.
-          </p>
-        </div>
-
-        <SubmissionForm client:load eventSlug="media-showcase-2026" />
+    {/* Tabbed content with right sidebar */}
+    <section id="tabs" class="bg-background scroll-mt-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {fetchError ? (
+          <div class="bg-card rounded-xl p-8 border border-border text-center">
+            <p class="text-muted-foreground">{fetchError}</p>
+            <p class="text-sm text-muted-foreground mt-2">
+              Event details are being loaded. Please check back soon.
+            </p>
+          </div>
+        ) : (
+          <EventTabs client:load tabs={tabs} />
+        )}
       </div>
     </section>
   </main>
