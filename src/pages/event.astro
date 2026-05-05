@@ -14,6 +14,9 @@ let fetchError = "";
 
 try {
   tabs = await fetchEventTabs(FOLDER_PATH);
+  // Volunteer is now a top-level nav item with a dedicated form page,
+  // not an event content tab. Filter it out of the section pills + content.
+  tabs = tabs.filter((t) => t.slug !== "media-showcase-2026-volunteer");
 } catch (e) {
   fetchError = e instanceof Error ? e.message : "Failed to load event content";
   console.error("Convex fetch error:", fetchError);
