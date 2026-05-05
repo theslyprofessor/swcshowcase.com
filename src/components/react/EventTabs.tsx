@@ -89,69 +89,56 @@ export default function EventTabs({ tabs }: EventTabsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeTab = tabs[activeIndex];
 
+  // Sync active tab with section pills in the page header. Pills emit
+  // [data-tab=N] clicks and #slug hash updates; we listen to both and
+  // also write back to the pills' visual active state.
+  const updateActive = (idx: number) => {
+    setActiveIndex(idx);
+    if (typeof document !== "undefined") {
+      document.querySelectorAll<HTMLElement>("[data-section-pill]").forEach((el) => {
+        const i = parseInt(el.getAttribute("data-tab") ?? "-1", 10);
+        if (i === idx) {
+          el.classList.add("text-primary", "border-primary");
+          el.classList.remove("text-muted-foreground", "border-transparent");
+        } else {
+          el.classList.remove("text-primary", "border-primary");
+          el.classList.add("text-muted-foreground", "border-transparent");
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("[data-tab]");
       if (target) {
         const idx = parseInt(target.getAttribute("data-tab") || "0", 10);
         if (idx >= 0 && idx < tabs.length) {
-          setActiveIndex(idx);
+          e.preventDefault();
+          updateActive(idx);
+          history.replaceState(null, "", `#${tabs[idx].slug}`);
         }
       }
     };
     document.addEventListener("click", handler);
+    // Initial sync from URL hash
+    if (typeof window !== "undefined" && window.location.hash) {
+      const slug = window.location.hash.slice(1);
+      const idx = tabs.findIndex((t) => t.slug === slug);
+      if (idx >= 0) updateActive(idx);
+    }
     return () => document.removeEventListener("click", handler);
   }, [tabs.length]);
 
   if (!activeTab) return null;
 
   return (
-    <div>
-      {/* Section sub-nav — fixed below the main header. Right-aligned on desktop. */}
-      <div className="fixed top-16 left-0 right-0 z-40 bg-background/85 backdrop-blur-md border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-end overflow-x-auto scrollbar-hide -mb-px">
-            <nav className="flex gap-1 sm:gap-2">
-              {tabs.map((tab, i) => {
-                const isActive = i === activeIndex;
-                const icon = tabIcons[tab.label] || "📄";
-                return (
-                  <button
-                    key={tab.slug}
-                    onClick={() => setActiveIndex(i)}
-                    className={`
-                      flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium
-                      transition-all relative whitespace-nowrap shrink-0
-                      ${isActive
-                        ? "text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                      }
-                    `}
-                  >
-                    <span className="text-base">{icon}</span>
-                    <span>{tab.label}</span>
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-      </div>
-
-      {/* Spacer to clear the fixed sub-nav */}
-      <div className="h-12" />
-
-      {/* Content */}
-      <div className="prose-event max-w-3xl min-h-[50vh]">
-        <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-          <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
-          {activeTab.title}
-        </h2>
-        <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
-      </div>
+    <div className="prose-event max-w-3xl">
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+        <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
+        {activeTab.title}
+      </h2>
+      <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
     </div>
   );
 }
