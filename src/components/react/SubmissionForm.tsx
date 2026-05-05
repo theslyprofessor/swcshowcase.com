@@ -275,6 +275,16 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         />
       </div>
 
+      {/* Donation note */}
+      <div className="bg-secondary/50 rounded-lg p-4 text-sm text-muted-foreground border border-border">
+        <p className="font-medium text-foreground mb-1">Door admission</p>
+        <p>
+          Free for current Southwestern College students with Student ID.
+          $10 suggested donation for general public at the door — supports
+          the Recording Arts &amp; Technology trust account.
+        </p>
+      </div>
+
       {/* Submit */}
       <button
         type="submit"
@@ -283,10 +293,6 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       >
         {submitting ? "Submitting..." : "Submit Your Work"}
       </button>
-
-      <p className="text-xs text-muted-foreground text-center">
-        By submitting, you agree to being filmed during the event if your submission is accepted.
-      </p>
     </form>
   );
 }
