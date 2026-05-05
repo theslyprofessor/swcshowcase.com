@@ -29,6 +29,8 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [isSWCEmail, setIsSWCEmail] = useState(false);
+  const [hasExistingAccount, setHasExistingAccount] = useState(false);
+  const [accountRequested, setAccountRequested] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -38,9 +40,10 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     availability: [] as string[],
     areasOfInterest: [] as string[],
     additionalNotes: "",
+    createAccount: false,
   });
 
-  const update = (field: string, value: string) =>
+  const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const toggle = (field: "availability" | "areasOfInterest", value: string) =>
@@ -80,6 +83,8 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
       } else {
         setSubmitted(true);
         setIsSWCEmail(data.value?.isSWCEmail ?? false);
+        setHasExistingAccount(data.value?.hasExistingAccount ?? false);
+        setAccountRequested(data.value?.requestedAccount ?? false);
       }
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -98,10 +103,39 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           briefing in advance of May 13. Day-of contact info will go out the
           week of the show.
         </p>
-        {isSWCEmail && (
+
+        {accountRequested && hasExistingAccount && (
+          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
+            <p className="text-sm text-secondary-foreground">
+              <span className="font-medium">Welcome back!</span> We linked this
+              sign-up to your existing midimaze account. Sign in at{" "}
+              <a
+                href="https://midimaze.com/login"
+                className="text-primary hover:underline font-medium"
+              >
+                midimaze.com/login
+              </a>{" "}
+              to track your volunteer status.
+            </p>
+          </div>
+        )}
+
+        {accountRequested && !hasExistingAccount && (
+          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
+            <p className="text-sm text-secondary-foreground">
+              <span className="font-medium">Account requested.</span> We'll send
+              a sign-in link to <span className="font-mono">{form.email}</span>{" "}
+              shortly. Once your midimaze account is set up you'll be able to
+              track your volunteer shift, see other events, and access shared
+              showcase resources.
+            </p>
+          </div>
+        )}
+
+        {!accountRequested && isSWCEmail && (
           <div className="bg-secondary rounded-lg p-4 mt-4">
             <p className="text-sm text-secondary-foreground">
-              SWC student detected — you'll be eligible for the same
+              SWC student detected — you're eligible for the same
               behind-the-scenes credit and PA hours that we issue for our
               regular shows.
             </p>
@@ -251,6 +285,27 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           placeholder="Allergies, accessibility needs, prior crew experience, friend you want to be paired with, etc."
         />
       </div>
+
+      {/* Account opt-in */}
+      <label className="flex items-start gap-3 bg-secondary/40 rounded-lg p-4 border border-border cursor-pointer hover:bg-secondary/60 transition-colors">
+        <input
+          type="checkbox"
+          checked={form.createAccount}
+          onChange={(e) => update("createAccount", e.target.checked)}
+          className="mt-1 accent-primary"
+        />
+        <span className="text-sm">
+          <span className="font-medium text-foreground block mb-1">
+            Associate this with a midimaze.com account
+          </span>
+          <span className="text-muted-foreground">
+            Optional. We'll link this sign-up to your existing midimaze account
+            (or send a sign-in link to create one) so you can track your shift
+            and access showcase resources. Your sign-up still goes through
+            either way.
+          </span>
+        </span>
+      </label>
 
       {/* Submit */}
       <button
