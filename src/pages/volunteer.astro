@@ -1,0 +1,41 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import VolunteerForm from "@/components/react/VolunteerForm";
+import SiteHeader from "@/components/SiteHeader.astro";
+---
+
+<BaseLayout
+  title="Volunteer — Media Showcase 2026"
+  description="Sign up to volunteer at the Media Showcase 2026 at Southwestern College."
+>
+  <SiteHeader activePath="event" />
+
+  <main class="pt-24 pb-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10 max-w-2xl mx-auto">
+        <p class="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+          Wednesday, May 13, 2026 &middot; SWCPAC
+        </p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+          <span class="gradient-text">Volunteer</span>
+          <span class="text-foreground"> at the Showcase</span>
+        </h1>
+        <p class="text-muted-foreground">
+          We need help across the whole day — load-in at noon, doors at 5:30 PM,
+          strike around 10 PM. Tell us when you're free and what you'd like to
+          do, and we'll match you to a shift.
+        </p>
+      </div>
+
+      <VolunteerForm client:load eventSlug="media-showcase-2026" />
+    </div>
+  </main>
+
+  <footer class="border-t border-border py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+      <span>&copy; {new Date().getFullYear()} Southwestern College</span>
+      <span class="mx-2">&middot;</span>
+      <a href="/about" class="hover:text-foreground transition-colors">About</a>
+    </div>
+  </footer>
+</BaseLayout>
