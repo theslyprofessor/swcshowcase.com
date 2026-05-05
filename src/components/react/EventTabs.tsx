@@ -107,37 +107,42 @@ export default function EventTabs({ tabs }: EventTabsProps) {
 
   return (
     <div>
-      {/* Top section nav — right-aligned on desktop, horizontal scroll on mobile */}
-      <div className="border-b border-border mb-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-end overflow-x-auto scrollbar-hide -mb-px">
-          <nav className="flex gap-1 sm:gap-2">
-            {tabs.map((tab, i) => {
-              const isActive = i === activeIndex;
-              const icon = tabIcons[tab.label] || "📄";
-              return (
-                <button
-                  key={tab.slug}
-                  onClick={() => setActiveIndex(i)}
-                  className={`
-                    flex items-center gap-2 px-3 sm:px-4 py-3 text-sm font-medium
-                    transition-all relative whitespace-nowrap shrink-0
-                    ${isActive
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
-                    }
-                  `}
-                >
-                  <span className="text-base">{icon}</span>
-                  <span>{tab.label}</span>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+      {/* Section sub-nav — fixed below the main header. Right-aligned on desktop. */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-background/85 backdrop-blur-md border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-end overflow-x-auto scrollbar-hide -mb-px">
+            <nav className="flex gap-1 sm:gap-2">
+              {tabs.map((tab, i) => {
+                const isActive = i === activeIndex;
+                const icon = tabIcons[tab.label] || "📄";
+                return (
+                  <button
+                    key={tab.slug}
+                    onClick={() => setActiveIndex(i)}
+                    className={`
+                      flex items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-medium
+                      transition-all relative whitespace-nowrap shrink-0
+                      ${isActive
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                      }
+                    `}
+                  >
+                    <span className="text-base">{icon}</span>
+                    <span>{tab.label}</span>
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
         </div>
       </div>
+
+      {/* Spacer to clear the fixed sub-nav */}
+      <div className="h-12" />
 
       {/* Content */}
       <div className="prose-event max-w-3xl min-h-[50vh]">
