@@ -1,0 +1,112 @@
+---
+interface Tab {
+  slug: string;
+  label: string;
+}
+
+interface Props {
+  /** Which top-level page is active */
+  activePath: 'home' | 'event' | 'about';
+  /** Section pills (only present when activePath === 'event' for live switching) */
+  tabs?: Tab[];
+}
+
+const { activePath, tabs = [] } = Astro.props;
+
+const sectionLabels = [
+  { slug: 'media-showcase-2026', label: 'Overview', icon: '🎭' },
+  { slug: 'media-showcase-2026-attend', label: 'Tickets', icon: '🎟️' },
+  { slug: 'media-showcase-2026-schedule', label: 'Schedule', icon: '📋' },
+  { slug: 'media-showcase-2026-performer-info', label: 'Performer Info', icon: '🎸' },
+  { slug: 'media-showcase-2026-volunteer', label: 'Volunteer', icon: '🤝' },
+  { slug: 'media-showcase-2026-food-venue', label: 'Food & Venue', icon: '📍' },
+];
+
+// On /event, use the dynamically-fetched tabs (in-order). Otherwise use the static label list above.
+const sections = activePath === 'event' && tabs.length > 0
+  ? tabs.map((t, i) => ({
+      slug: t.slug,
+      label: t.label,
+      icon: sectionLabels.find((s) => s.label === t.label)?.icon ?? '📄',
+      index: i,
+    }))
+  : sectionLabels.map((s, i) => ({ ...s, index: i }));
+
+// Default-active styling for the section pills:
+// - On /event: first pill (Overview) is active until JS reads URL hash + switches.
+// - On / or /about: no section pill is active (Submit/About pill is active instead).
+const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-1 h-14 overflow-x-auto scrollbar-hide">
+      {/* Logo — only thing on the left */}
+      <a href="/" class="flex items-center gap-2 font-bold text-sm shrink-0 mr-3">
+        <span class="gradient-text">SWC</span>
+        <span class="text-foreground hidden sm:inline">Media Showcase</span>
+      </a>
+
+      {/* Spacer pushes everything to the right */}
+      <div class="flex-1"></div>
+
+      {/* Section pills */}
+      {sections.map((s) => {
+        const isActive = activePath === 'event' && s.index === eventDefaultActiveIdx;
+        const href = activePath === 'event' ? `#${s.slug}` : `/event#${s.slug}`;
+        return (
+          <a
+            href={href}
+            data-tab={activePath === 'event' ? s.index : undefined}
+            data-section-pill
+            class:list={[
+              'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+              isActive
+                ? 'text-primary border-primary'
+                : 'text-muted-foreground border-transparent hover:text-foreground',
+            ]}
+          >
+            <span>{s.icon}</span>
+            <span>{s.label}</span>
+          </a>
+        );
+      })}
+
+      {/* Submit pill */}
+      <a
+        href="/"
+        class:list={[
+          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          activePath === 'home'
+            ? 'text-primary border-primary'
+            : 'text-muted-foreground border-transparent hover:text-foreground',
+        ]}
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 19v-7m0 0V5m0 7h7m-7 0H5" />
+        </svg>
+        <span>Submit</span>
+      </a>
+
+      {/* About pill */}
+      <a
+        href="/about"
+        class:list={[
+          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          activePath === 'about'
+            ? 'text-primary border-primary'
+            : 'text-muted-foreground border-transparent hover:text-foreground',
+        ]}
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+          />
+        </svg>
+        <span>About</span>
+      </a>
+    </div>
+  </div>
+</header>
