@@ -11,6 +11,8 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [isSWCEmail, setIsSWCEmail] = useState(false);
+  const [hasExistingAccount, setHasExistingAccount] = useState(false);
+  const [accountRequested, setAccountRequested] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -25,9 +27,10 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     equipmentNeeds: "",
     timingPreference: "no_preference" as "earlier" | "later" | "no_preference",
     additionalNotes: "",
+    createAccount: false,
   });
 
-  const update = (field: string, value: string) =>
+  const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,6 +56,8 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       } else {
         setSubmitted(true);
         setIsSWCEmail(data.value?.isSWCEmail ?? false);
+        setHasExistingAccount(data.value?.hasExistingAccount ?? false);
+        setAccountRequested(data.value?.requestedAccount ?? false);
       }
     } catch {
       setError("Network error. Please check your connection and try again.");
@@ -70,7 +75,35 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           Thank you, {form.firstName}! Your submission for the Media Showcase has been received.
           We'll review it and get back to you.
         </p>
-        {isSWCEmail && (
+
+        {accountRequested && hasExistingAccount && (
+          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
+            <p className="text-sm text-secondary-foreground">
+              <span className="font-medium">Welcome back!</span> We linked this submission to
+              your existing midimaze account. Sign in at{" "}
+              <a
+                href="https://midimaze.com/login"
+                className="text-primary hover:underline font-medium"
+              >
+                midimaze.com/login
+              </a>{" "}
+              to view, edit, and track your submission status.
+            </p>
+          </div>
+        )}
+
+        {accountRequested && !hasExistingAccount && (
+          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
+            <p className="text-sm text-secondary-foreground">
+              <span className="font-medium">Account requested.</span> We'll send a sign-in link
+              to <span className="font-mono">{form.email}</span> shortly. Once you create your
+              midimaze account with this email, you'll be able to view, edit, and track your
+              submission at <span className="font-medium">midimaze.com/showcase/my-submission</span>.
+            </p>
+          </div>
+        )}
+
+        {!accountRequested && isSWCEmail && (
           <div className="bg-secondary rounded-lg p-4 mt-4">
             <p className="text-sm text-secondary-foreground">
               We noticed you're using an SWC email.{" "}
@@ -175,7 +208,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           onChange={(e) => update("description", e.target.value)}
           rows={4}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
-          placeholder="Describe what you'd like to present. Include details like genre/format, gear you'll use, and estimated length. Rough stages are fine — share as much as you can."
+          placeholder="Tell us about your work — what's it about, what inspired it, what should the audience know going in? Plain language is fine, no need to be polished."
         />
       </div>
 
@@ -274,6 +307,26 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           placeholder="Optional"
         />
       </div>
+
+      {/* Account opt-in */}
+      <label className="flex items-start gap-3 bg-secondary/40 rounded-lg p-4 border border-border cursor-pointer hover:bg-secondary/60 transition-colors">
+        <input
+          type="checkbox"
+          checked={form.createAccount}
+          onChange={(e) => update("createAccount", e.target.checked)}
+          className="mt-1 accent-primary"
+        />
+        <span className="text-sm">
+          <span className="font-medium text-foreground block mb-1">
+            Create a free midimaze account so I can track and edit my submission
+          </span>
+          <span className="text-muted-foreground">
+            We'll link this submission to your account and send you a sign-in link.
+            You'll be able to update your description, swap your media link, and see your
+            slot once we've finalized the run of show.
+          </span>
+        </span>
+      </label>
 
       {/* Donation note */}
       <div className="bg-secondary/50 rounded-lg p-4 text-sm text-muted-foreground border border-border">
