@@ -105,6 +105,14 @@ export default function EventTabs({ tabs }: EventTabsProps) {
           el.classList.add("text-muted-foreground", "border-transparent");
         }
       });
+
+      // Hero only shows on Overview (first tab). Hide on every other tab so
+      // subsequent tabs start fresh under the top bar; bump content padding
+      // to fill the space the hero would have provided.
+      const hero = document.getElementById("event-hero");
+      const tabsSection = document.getElementById("tabs");
+      if (hero) hero.style.display = idx === 0 ? "" : "none";
+      if (tabsSection) tabsSection.style.paddingTop = idx === 0 ? "" : "5.5rem";
     }
   };
 
