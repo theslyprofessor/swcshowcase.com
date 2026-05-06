@@ -316,9 +316,10 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
                   Ushering also requires SignUpGenius
                 </p>
                 <p className="text-amber-200/90 leading-relaxed">
-                  All PAC ushers — including for the showcase — must sign up through Lizette's
-                  SignUpGenius. Your shift gets scheduled there. (This form just lets us know
-                  you're interested.)
+                  All PAC ushers — including for the showcase — must sign up through SignUpGenius.
+                  Your shift gets scheduled there. Please fill out that form{" "}
+                  <span className="font-semibold">and</span> this form so that we are all aware of
+                  your interest in volunteering.
                 </p>
               </div>
             </div>
