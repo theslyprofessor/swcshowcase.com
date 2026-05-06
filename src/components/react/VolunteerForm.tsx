@@ -71,7 +71,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
 
     if (wantsToUsher && !form.confirmedSignUpGenius) {
       setError(
-        "Ushers must also sign up through Lizette's SignUpGenius — confirm below before submitting."
+        "Ushers must also sign up through SignUpGenius — confirm below before submitting."
       );
       setSubmitting(false);
       return;
@@ -171,7 +171,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
           >
-            Sign up via Lizette's SignUpGenius →
+            Sign up via SignUpGenius →
           </a>
         </div>
       </div>
@@ -329,7 +329,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 font-semibold px-4 py-2 rounded-lg hover:bg-amber-400 transition-colors text-sm"
             >
-              Open Lizette's SignUpGenius
+              Open SignUpGenius
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -344,7 +344,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
               />
               <span className="text-sm text-amber-200">
                 <span className="font-medium">Required:</span> I've signed up (or will sign up before the event)
-                via Lizette's SignUpGenius for ushering.
+                via SignUpGenius for ushering.
               </span>
             </label>
           </div>
