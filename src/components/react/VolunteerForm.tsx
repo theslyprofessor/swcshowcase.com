@@ -142,6 +142,27 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
             </p>
           </div>
         )}
+
+        <div className="mt-6 pt-6 border-t border-border text-left">
+          <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-2">
+            Also at SWCPAC
+          </p>
+          <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+            While you're here — the PAC needs ushers for{" "}
+            <span className="text-foreground font-medium">Jazz Café (tomorrow night)</span>
+            ,{" "}
+            <span className="text-foreground font-medium">Drama Festival (this weekend)</span>
+            , and other shows. Possible extra credit / service hours at your instructor's discretion.
+          </p>
+          <a
+            href="https://www.signupgenius.com/go/10C0449AEAF2FA0F4C70-62076924-spring#/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+          >
+            Sign up via Lizette's SignUpGenius →
+          </a>
+        </div>
       </div>
     );
   }
