@@ -7,7 +7,8 @@ interface VolunteerFormProps {
 }
 
 const TIME_BLOCKS = [
-  { value: "12-2pm", label: "12 – 2 PM (load-in / setup)" },
+  { value: "10am-12pm", label: "10 AM – 12 PM (gear prep at Recording Arts)" },
+  { value: "12-2pm", label: "12 – 2 PM (load-in / setup at SWCPAC)" },
   { value: "2-4pm", label: "2 – 4 PM (setup / soundcheck)" },
   { value: "4-6pm", label: "4 – 6 PM (final prep / doors)" },
   { value: "6-8pm", label: "6 – 8 PM (show — first half)" },
