@@ -334,7 +334,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         <p>
           Free for current Southwestern College students with Student ID.
           $10 suggested donation for general public at the door — supports
-          the Recording Arts &amp; Technology trust account.
+          our RA&amp;T and FTMA programs.
         </p>
       </div>
 
