@@ -42,7 +42,10 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     areasOfInterest: [] as string[],
     additionalNotes: "",
     createAccount: false,
+    confirmedSignUpGenius: false,
   });
+
+  const wantsToUsher = form.areasOfInterest.includes("ushering");
 
   const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -62,6 +65,14 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
 
     if (form.availability.length === 0) {
       setError("Pick at least one time block — even one hour helps.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (wantsToUsher && !form.confirmedSignUpGenius) {
+      setError(
+        "Ushers must also sign up through Lizette's SignUpGenius — confirm below before submitting."
+      );
       setSubmitting(false);
       return;
     }
@@ -292,6 +303,51 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
             );
           })}
         </div>
+
+        {/* Required: SignUpGenius confirmation when ushering is checked */}
+        {wantsToUsher && (
+          <div className="mt-3 bg-amber-500/10 border-2 border-amber-500/40 rounded-lg p-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <svg className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <div className="flex-1 text-sm">
+                <p className="font-semibold text-amber-300 mb-1">
+                  Ushering also requires SignUpGenius
+                </p>
+                <p className="text-amber-200/90 leading-relaxed">
+                  All PAC ushers — including for the showcase — must sign up through Lizette's
+                  SignUpGenius. Your shift gets scheduled there. (This form just lets us know
+                  you're interested.)
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://www.signupgenius.com/go/10C0449AEAF2FA0F4C70-62076924-spring#/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 font-semibold px-4 py-2 rounded-lg hover:bg-amber-400 transition-colors text-sm"
+            >
+              Open Lizette's SignUpGenius
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </a>
+            <label className="flex items-start gap-3 cursor-pointer pt-1">
+              <input
+                type="checkbox"
+                required
+                checked={form.confirmedSignUpGenius}
+                onChange={(e) => update("confirmedSignUpGenius", e.target.checked)}
+                className="mt-0.5 accent-amber-400 h-4 w-4"
+              />
+              <span className="text-sm text-amber-200">
+                <span className="font-medium">Required:</span> I've signed up (or will sign up before the event)
+                via Lizette's SignUpGenius for ushering.
+              </span>
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Additional notes */}
