@@ -50,7 +50,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center gap-1 h-14 overflow-x-auto scrollbar-hide">
+    <div class="flex items-center gap-0.5 lg:gap-1 h-14 overflow-x-auto scrollbar-hide pr-2">
       {/* Logo — only thing on the left */}
       <a href="/" class="flex items-baseline gap-2 font-bold shrink-0 mr-3">
         <span class="gradient-text text-3xl">SWC</span>
@@ -70,7 +70,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
             data-tab={activePath === 'home' ? s.index : undefined}
             data-section-pill
             class:list={[
-              'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+              'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
               isActive
                 ? 'text-primary border-primary'
                 : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -86,7 +86,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/about"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'about'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -100,7 +100,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/submit"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'submit'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -114,7 +114,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/volunteer"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'volunteer'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
