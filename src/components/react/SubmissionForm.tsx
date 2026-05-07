@@ -19,6 +19,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     lastName: "",
     email: "",
     classes: "",
+    section: "",
     title: "",
     description: "",
     genre: "",
@@ -221,17 +222,36 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </p>
       </div>
 
-      {/* Classes */}
-      <div>
-        <label className="block text-sm font-medium mb-1.5">
-          What class(es) are you taking in FTMA or RA&T?
-        </label>
-        <input
-          value={form.classes}
-          onChange={(e) => update("classes", e.target.value)}
-          className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="e.g. RA&T 105, FTMA 111"
-        />
+      {/* Classes + Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1.5">
+            Course name &amp; number(s)
+          </label>
+          <input
+            value={form.classes}
+            onChange={(e) => update("classes", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="e.g. RA&T 105, FTMA 111"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            What class(es) are you taking in FTMA or RA&amp;T?
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">
+            Section(s)
+          </label>
+          <input
+            value={form.section}
+            onChange={(e) => update("section", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="e.g. 01, 03"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Section number from your registration.
+          </p>
+        </div>
       </div>
 
       {/* Title */}
