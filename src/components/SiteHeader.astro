@@ -18,7 +18,7 @@ const VOLUNTEER_SLUG = 'media-showcase-2026-volunteer';
 const sectionLabels = [
   { slug: 'media-showcase-2026', label: 'Overview', icon: '🎭' },
   { slug: 'media-showcase-2026-attend', label: 'Tickets', icon: '🎟️' },
-  { slug: 'media-showcase-2026-schedule', label: 'Schedule', icon: '📋' },
+  { slug: 'media-showcase-2026-schedule', label: 'Program', icon: '📋' },
   { slug: 'media-showcase-2026-performer-info', label: 'Performer Info', icon: '🎸' },
   { slug: 'media-showcase-2026-food-venue', label: 'Food & Venue', icon: '📍' },
 ];
@@ -65,7 +65,7 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
             data-tab={activePath === 'event' ? s.index : undefined}
             data-section-pill
             class:list={[
-              'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+              'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
               isActive
                 ? 'text-primary border-primary'
                 : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -81,7 +81,7 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
       <a
         href="/about"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'about'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -101,7 +101,7 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
       <a
         href="/"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'home'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -117,7 +117,7 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
       <a
         href="/volunteer"
         class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'volunteer'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',

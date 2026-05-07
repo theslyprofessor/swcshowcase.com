@@ -90,6 +90,7 @@ const tabIcons: Record<string, string> = {
   "Overview": "🎭",
   "Tickets": "🎟️",
   "Attend": "🎟️",
+  "Program": "📋",
   "Schedule": "📋",
   "Performer Info": "🎸",
   "Volunteer": "🤝",

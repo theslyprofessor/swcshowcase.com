@@ -31,7 +31,7 @@ try {
 
   <main>
     {/* Hero — shown only when the Overview tab is active (EventTabs toggles via JS) */}
-    <section id="event-hero" class="gradient-hero pt-24 pb-8 sm:pt-28 sm:pb-12">
+    <section id="event-hero" class="gradient-hero pt-24 pb-4 sm:pt-28 sm:pb-6">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl">
           <div class="mb-8 space-y-1.5">
@@ -39,11 +39,11 @@ try {
               Southwestern College
             </p>
             <p class="font-semibold text-base sm:text-lg leading-snug">
-              <span class="bg-gradient-to-r from-primary via-amber-300 to-foreground bg-clip-text text-transparent">
+              <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
                 Recording Arts &amp; Technology
               </span>
               <span class="text-muted-foreground/70 mx-2">·</span>
-              <span class="bg-gradient-to-r from-foreground via-amber-300 to-primary bg-clip-text text-transparent">
+              <span class="bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
                 Film, Television &amp; Media Arts
               </span>
             </p>
@@ -97,7 +97,7 @@ try {
 
     {/* Tabbed content with right sidebar */}
     <section id="tabs" class="bg-background scroll-mt-16">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         {fetchError ? (
           <div class="bg-card rounded-xl p-8 border border-border text-center">
             <p class="text-muted-foreground">{fetchError}</p>

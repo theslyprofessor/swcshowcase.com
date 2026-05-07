@@ -8,7 +8,7 @@ interface VolunteerFormProps {
 
 const TIME_BLOCKS = [
   { value: "10am-12pm", label: "10 AM – 12 PM (gear prep at Recording Arts)" },
-  { value: "12-2pm", label: "12 – 2 PM (load-in / setup at SWCPAC)" },
+  { value: "12-2pm", label: "12 – 2 PM (load-in / setup at the Performing Arts Center)" },
   { value: "2-4pm", label: "2 – 4 PM (setup / soundcheck)" },
   { value: "4-6pm", label: "4 – 6 PM (final prep / doors)" },
   { value: "6-8pm", label: "6 – 8 PM (show — first half)" },
@@ -156,7 +156,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
 
         <div className="mt-6 pt-6 border-t border-border text-left">
           <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-2">
-            Also at SWCPAC
+            Also at the Performing Arts Center
           </p>
           <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
             While you're here — the PAC needs ushers for{" "}

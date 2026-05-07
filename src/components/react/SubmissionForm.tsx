@@ -333,7 +333,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         <p className="font-medium text-foreground mb-1">Door admission</p>
         <p>
           Free for current Southwestern College students with Student ID.
-          $10 suggested donation for general public at the door — supports
+          $10 general entry for general public at the door — supports
           our RA&amp;T and FTMA programs.
         </p>
       </div>
