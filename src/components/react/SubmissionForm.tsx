@@ -117,6 +117,56 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             </p>
           </div>
         )}
+
+        <div className="mt-6 pt-6 border-t border-border text-left space-y-3">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+            What happens next
+          </p>
+          <a
+            href="https://midimaze.com/events/media-showcase-2026/my-submission"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 transition-colors"
+          >
+            <span className="text-xl shrink-0">📝</span>
+            <span className="flex-1">
+              <span className="font-medium text-foreground block text-sm">
+                Manage your submission
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Edit your description, swap your media link, or check your status anytime —
+                sign in with the same email.
+              </span>
+            </span>
+          </a>
+          <a
+            href="https://midimaze.com/events/media-showcase-2026/live-schedule"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 transition-colors"
+          >
+            <span className="text-xl shrink-0">📋</span>
+            <span className="flex-1">
+              <span className="font-medium text-foreground block text-sm">
+                Live schedule
+              </span>
+              <span className="text-xs text-muted-foreground">
+                See the run of show as it gets locked in. Updates in real time
+                — bookmark this page for showtime.
+              </span>
+            </span>
+          </a>
+          <p className="text-xs text-muted-foreground pt-1">
+            Questions? Email{" "}
+            <a
+              href="mailto:info@swcshowcase.com"
+              className="text-primary hover:underline"
+            >
+              info@swcshowcase.com
+            </a>
+            .
+          </p>
+        </div>
       </div>
     );
   }
