@@ -140,12 +140,19 @@ export default function EventTabs({ tabs }: EventTabsProps) {
 
   if (!activeTab) return null;
 
+  // Hide the redundant H2 on the Overview tab — the hero already shows
+  // "Media Showcase 2026". Other tabs keep their title since the hero is
+  // hidden on those.
+  const isOverview = activeIndex === 0;
+
   return (
     <div className="prose-event max-w-3xl">
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-        <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
-        {activeTab.title}
-      </h2>
+      {!isOverview && (
+        <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+          <span className="text-3xl">{tabIcons[activeTab.label] || "📄"}</span>
+          {activeTab.title}
+        </h2>
+      )}
       <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
     </div>
   );

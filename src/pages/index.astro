@@ -7,85 +7,27 @@ import SiteHeader from "@/components/SiteHeader.astro";
 <BaseLayout>
   <SiteHeader activePath="home" />
 
-  <main>
-    {/* Hero — large, three-line eyebrow, time included */}
-    <section class="gradient-hero pt-24 pb-12 sm:pt-28 sm:pb-16">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl">
-          {/* Eyebrow — Southwestern College above, programs in gradient on one line */}
-          <div class="mb-8 space-y-1.5">
-            <p class="text-primary font-bold tracking-wider uppercase text-base sm:text-lg">
-              Southwestern College
-            </p>
-            <p class="font-semibold text-base sm:text-lg leading-snug">
-              <span class="bg-gradient-to-r from-primary via-amber-300 to-foreground bg-clip-text text-transparent">
-                Recording Arts &amp; Technology
-              </span>
-              <span class="text-muted-foreground/70 mx-2">·</span>
-              <span class="bg-gradient-to-r from-foreground via-amber-300 to-primary bg-clip-text text-transparent">
-                Film, Television &amp; Media Arts
-              </span>
-            </p>
-          </div>
-
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.05]">
-            <span class="gradient-text">Media</span>
-            <span class="text-foreground"> Showcase</span>
-            <span class="text-muted-foreground font-light"> 2026</span>
-          </h1>
-
-          <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-base sm:text-lg text-muted-foreground mb-10">
-            <div class="flex items-center gap-2.5">
-              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-              </svg>
-              <span class="text-foreground font-medium">Wednesday, May 13, 2026</span>
-            </div>
-            <div class="flex items-center gap-2.5">
-              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Doors 5:30 PM &middot; Show 6:00&ndash;10:00 PM</span>
-            </div>
-            <div class="flex items-center gap-2.5">
-              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              <a
-                href="https://www.google.com/maps/dir//Southwestern+College+Performing+Arts+Center,+900+Otay+Lakes+Rd,+Chula+Vista,+CA+91910/@32.626909,-117.0441006,2769m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x80d94f34dd430ec1:0x365be289d98394cc!2m2!1d-116.9981145!2d32.6433491"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover:text-foreground transition-colors underline-offset-4 hover:underline"
-              >Southwestern College Performing Arts Center</a>
-            </div>
-          </div>
-
-          <p class="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl">
-            Submit your work for an evening celebrating student audio, music, film,
-            and media arts. <a href="/event" class="text-primary hover:underline font-medium">See full event info →</a>
-          </p>
-        </div>
+  <main class="pt-24 pb-16 bg-background min-h-screen">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mx-auto mb-10 text-center">
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+          <span class="gradient-text">Submit</span>
+          <span class="text-foreground"> Your Work</span>
+        </h1>
+        <p class="text-muted-foreground mb-2">
+          Tell us what you'd like to present at the Media Showcase 2026. Space is limited —
+          earlier submissions get priority slot consideration.
+        </p>
+        <p class="text-sm text-amber-300">
+          Submission deadline: <span class="font-semibold">Sunday, May 10 · 11:59 PM</span>
+        </p>
+        <p class="text-xs text-muted-foreground mt-3">
+          Need event details? <a href="/event" class="text-primary hover:underline">See Overview →</a>
+        </p>
       </div>
-    </section>
 
-    {/* Form */}
-    <section class="bg-background py-16">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl mx-auto mb-10">
-          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
-            <span class="gradient-text">Submit</span>
-            <span class="text-foreground"> Your Work</span>
-          </h2>
-          <p class="text-muted-foreground">
-            Tell us what you'd like to present. Space is limited — earlier submissions
-            get priority slot consideration.
-          </p>
-        </div>
-
-        <SubmissionForm client:load eventSlug="media-showcase-2026" />
-      </div>
-    </section>
+      <SubmissionForm client:load eventSlug="media-showcase-2026" />
+    </div>
   </main>
 
   {/* Footer */}

@@ -55,27 +55,7 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
       {/* Spacer pushes everything to the right */}
       <div class="flex-1"></div>
 
-      {/* About pill — first item in the right cluster */}
-      <a
-        href="/about"
-        class:list={[
-          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
-          activePath === 'about'
-            ? 'text-primary border-primary'
-            : 'text-muted-foreground border-transparent hover:text-foreground',
-        ]}
-      >
-        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-          />
-        </svg>
-        <span>About</span>
-      </a>
-
-      {/* Section pills */}
+      {/* Section pills (Overview / Tickets / Schedule / Performer Info / Food & Venue) */}
       {sections.map((s) => {
         const isActive = activePath === 'event' && s.index === eventDefaultActiveIdx;
         const href = activePath === 'event' ? `#${s.slug}` : `/event#${s.slug}`;
@@ -96,6 +76,26 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
           </a>
         );
       })}
+
+      {/* About pill — right before Submit + Volunteer */}
+      <a
+        href="/about"
+        class:list={[
+          'flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          activePath === 'about'
+            ? 'text-primary border-primary'
+            : 'text-muted-foreground border-transparent hover:text-foreground',
+        ]}
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+          />
+        </svg>
+        <span>About</span>
+      </a>
 
       {/* Submit pill — next-to-last */}
       <a
