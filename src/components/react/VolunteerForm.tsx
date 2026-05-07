@@ -277,8 +277,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           What kind of work would you like to do?
         </label>
         <p className="text-xs text-muted-foreground mb-3">
-          Pick what sounds good — we'll do our best to match. "Anywhere you need me"
-          is a power move and very appreciated.
+          Pick what sounds good — we'll do our best to match.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {AREAS.map((area) => {
