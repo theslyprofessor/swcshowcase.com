@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'static',
   redirects: {
-    '/submit': '/',
+    '/event': '/',
   },
   integrations: [react()],
   vite: {

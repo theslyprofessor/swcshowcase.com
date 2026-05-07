@@ -1,32 +1,131 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import SubmissionForm from "@/components/react/SubmissionForm";
+import EventTabs from "@/components/react/EventTabs";
 import SiteHeader from "@/components/SiteHeader.astro";
+import { fetchEventTabs } from "@/lib/convex";
+
+// ---------------------------------------------------------------------------
+// Build-time fetch from Convex (convex-content module)
+// ---------------------------------------------------------------------------
+const FOLDER_PATH = "Academic Resources/Events/Media Showcase 2026";
+
+let tabs: Awaited<ReturnType<typeof fetchEventTabs>> = [];
+let fetchError = "";
+
+try {
+  tabs = await fetchEventTabs(FOLDER_PATH);
+  // Volunteer is now a top-level nav item with a dedicated form page,
+  // not an event content tab. Filter it out of the section pills + content.
+  tabs = tabs.filter((t) => t.slug !== "media-showcase-2026-volunteer");
+} catch (e) {
+  fetchError = e instanceof Error ? e.message : "Failed to load event content";
+  console.error("Convex fetch error:", fetchError);
+}
 ---
 
-<BaseLayout>
-  <SiteHeader activePath="home" />
+<BaseLayout
+  title="Event Info — Media Showcase 2026"
+  description="Full event details for the Media Showcase 2026 at Southwestern College."
+>
+  <SiteHeader activePath="home" tabs={tabs} />
 
-  <main class="pt-24 pb-16 bg-background min-h-screen">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-2xl mx-auto mb-10 text-center">
-        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
-          <span class="gradient-text">Submit</span>
-          <span class="text-foreground"> Your Work</span>
-        </h1>
-        <p class="text-muted-foreground mb-2">
-          Tell us what you'd like to present at the Media Showcase 2026.
-        </p>
-        <p class="text-sm text-amber-300">
-          Submission deadline: <span class="font-semibold">Sunday, May 10 · 11:59 PM</span>
-        </p>
-        <p class="text-xs text-muted-foreground mt-3">
-          Need event details? <a href="/event" class="text-primary hover:underline">See Overview →</a>
-        </p>
+  <main>
+    {/* Hero — shown only when the Overview tab is active (EventTabs toggles via JS) */}
+    <section id="event-hero" class="gradient-hero pt-24 pb-4 sm:pt-28 sm:pb-6">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl">
+          <div class="mb-8 space-y-1.5">
+            <p class="text-primary font-bold tracking-wider uppercase text-base sm:text-lg">
+              Southwestern College
+            </p>
+            <p class="font-semibold text-base sm:text-lg leading-snug">
+              <span class="bg-gradient-to-r from-blue-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+                Recording Arts &amp; Technology
+              </span>
+              <span class="text-muted-foreground/70 mx-2">·</span>
+              <span class="bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                Film, Television &amp; Media Arts
+              </span>
+            </p>
+          </div>
+
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.05]">
+            <span class="gradient-text">Media</span>
+            <span class="text-foreground"> Showcase</span>
+            <span class="text-muted-foreground font-light"> 2026</span>
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-base sm:text-lg text-muted-foreground">
+            <div class="flex items-center gap-2.5">
+              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+              <span class="text-foreground font-medium">Wednesday, May 13, 2026</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Doors 5:45 PM &middot; Show 6:00&ndash;10:00 PM</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              <a
+                href="https://www.google.com/maps/dir//Southwestern+College+Performing+Arts+Center,+900+Otay+Lakes+Rd,+Chula+Vista,+CA+91910/@32.626909,-117.0441006,2769m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x80d94f34dd430ec1:0x365be289d98394cc!2m2!1d-116.9981145!2d32.6433491"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >Southwestern College Performing Arts Center</a>
+            </div>
+          </div>
+
+          <div class="mt-8 inline-block">
+            <div class="flex flex-wrap items-center gap-3">
+              <a
+                href="/submit"
+                class="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-7 py-3 rounded-lg hover:bg-primary/90 transition-colors min-w-[14rem]"
+              >
+                Submit Your Work
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </a>
+              <a
+                href="/volunteer"
+                class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold px-7 py-3 rounded-lg hover:from-blue-400 hover:to-cyan-400 transition-colors min-w-[14rem]"
+              >
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                </svg>
+                Volunteer
+              </a>
+            </div>
+            <p class="mt-3 text-sm text-amber-300 text-center">
+              Submission deadline: <span class="font-semibold">Sunday, May 10 &middot; 11:59 PM</span>
+            </p>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <SubmissionForm client:load eventSlug="media-showcase-2026" />
-    </div>
+    {/* Tabbed content with right sidebar */}
+    <section id="tabs" class="bg-background scroll-mt-16">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        {fetchError ? (
+          <div class="bg-card rounded-xl p-8 border border-border text-center">
+            <p class="text-muted-foreground">{fetchError}</p>
+            <p class="text-sm text-muted-foreground mt-2">
+              Event details are being loaded. Please check back soon.
+            </p>
+          </div>
+        ) : (
+          <EventTabs client:load tabs={tabs} />
+        )}
+      </div>
+    </section>
   </main>
 
   {/* Footer */}

@@ -5,9 +5,14 @@ interface Tab {
 }
 
 interface Props {
-  /** Which top-level page is active */
-  activePath: 'home' | 'event' | 'about' | 'volunteer';
-  /** Section pills (only present when activePath === 'event' for live switching) */
+  /** Which top-level page is active.
+   *  'home'      = / (Overview + section tabs — the marketing-facing front page)
+   *  'submit'    = /submit (submission form)
+   *  'about'     = /about
+   *  'volunteer' = /volunteer
+   */
+  activePath: 'home' | 'submit' | 'about' | 'volunteer';
+  /** Section pills (only relevant when activePath === 'home' for live tab switching) */
   tabs?: Tab[];
 }
 
@@ -26,7 +31,7 @@ const sectionLabels = [
 // On /event, use the dynamically-fetched tabs (in-order, excluding Volunteer
 // since Volunteer is a top-level nav item now, not a section). Otherwise use
 // the static label list above.
-const sections = activePath === 'event' && tabs.length > 0
+const sections = activePath === 'home' && tabs.length > 0
   ? tabs
       .filter((t) => t.slug !== VOLUNTEER_SLUG)
       .map((t, i) => ({
@@ -40,16 +45,16 @@ const sections = activePath === 'event' && tabs.length > 0
 // Default-active styling for the section pills:
 // - On /event: first pill (Overview) is active until JS reads URL hash + switches.
 // - On / or /about: no section pill is active (Submit/About pill is active instead).
-const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
+const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center gap-1 h-14 overflow-x-auto scrollbar-hide">
       {/* Logo — only thing on the left */}
-      <a href="/" class="flex items-center gap-2 font-bold text-sm shrink-0 mr-3">
-        <span class="gradient-text">SWC</span>
-        <span class="text-foreground hidden sm:inline">Media Showcase</span>
+      <a href="/" class="flex items-baseline gap-2 font-bold shrink-0 mr-3">
+        <span class="gradient-text text-2xl">SWC</span>
+        <span class="text-foreground text-sm hidden sm:inline">Media Showcase</span>
       </a>
 
       {/* Spacer pushes everything to the right */}
@@ -57,12 +62,12 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
 
       {/* Section pills (Overview / Tickets / Schedule / Performer Info / Food & Venue) */}
       {sections.map((s) => {
-        const isActive = activePath === 'event' && s.index === eventDefaultActiveIdx;
-        const href = activePath === 'event' ? `#${s.slug}` : `/event#${s.slug}`;
+        const isActive = activePath === 'home' && s.index === eventDefaultActiveIdx;
+        const href = activePath === 'home' ? `#${s.slug}` : `/#${s.slug}`;
         return (
           <a
             href={href}
-            data-tab={activePath === 'event' ? s.index : undefined}
+            data-tab={activePath === 'home' ? s.index : undefined}
             data-section-pill
             class:list={[
               'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
@@ -93,10 +98,10 @@ const eventDefaultActiveIdx = activePath === 'event' ? 0 : -1;
 
       {/* Submit pill — next-to-last */}
       <a
-        href="/"
+        href="/submit"
         class:list={[
           'flex items-center gap-1.5 px-3 py-2 text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
-          activePath === 'home'
+          activePath === 'submit'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
         ]}

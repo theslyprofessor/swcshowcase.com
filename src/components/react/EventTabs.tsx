@@ -30,10 +30,11 @@ function renderMarkdown(md: string): string {
   html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
   // Markdown images — ![alt](src) — render BEFORE link replacement so the
-  // leading `!` doesn't get caught by the link regex.
+  // leading `!` doesn't get caught by the link regex.  Hide the broken-icon
+  // entirely if the asset fails to load (no ugly placeholder square).
   html = html.replace(
     /!\[([^\]]*)\]\(([^)]+)\)/g,
-    '<img src="$2" alt="$1" class="my-6 rounded-lg border border-border max-w-full h-auto" loading="lazy" />',
+    '<img src="$2" alt="$1" class="my-6 rounded-lg border border-border max-w-full h-auto" loading="lazy" onerror="this.style.display=\'none\'" />',
   );
 
   // Strip Obsidian-style wikilink images that vault-sync may pass through
