@@ -98,7 +98,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
               <span className="font-medium">Account requested.</span> We'll send a sign-in link
               to <span className="font-mono">{form.email}</span> shortly. Once you create your
               midimaze account with this email, you'll be able to view, edit, and track your
-              submission at <span className="font-medium">midimaze.com/showcase/my-submission</span>.
+              submission at <span className="font-medium">midimaze.com/events/media-showcase-2026/my-submission</span>.
             </p>
           </div>
         )}
