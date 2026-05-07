@@ -29,6 +29,18 @@ function renderMarkdown(md: string): string {
   html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
 
+  // Markdown images — ![alt](src) — render BEFORE link replacement so the
+  // leading `!` doesn't get caught by the link regex.
+  html = html.replace(
+    /!\[([^\]]*)\]\(([^)]+)\)/g,
+    '<img src="$2" alt="$1" class="my-6 rounded-lg border border-border max-w-full h-auto" loading="lazy" />',
+  );
+
+  // Strip Obsidian-style wikilink images that vault-sync may pass through
+  // un-translated (![[file.svg]]). They reference vault-relative paths the
+  // public site can't resolve.
+  html = html.replace(/!\[\[[^\]]+\]\]/g, "");
+
   html = html.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-medium">$1</a>',
@@ -58,7 +70,11 @@ function renderMarkdown(md: string): string {
       const trimmed = line.trim();
       if (trimmed === "") {
         // skip
-      } else if (trimmed.startsWith("<h") || trimmed.startsWith("<hr")) {
+      } else if (
+        trimmed.startsWith("<h") ||
+        trimmed.startsWith("<hr") ||
+        trimmed.startsWith("<img")
+      ) {
         result.push(trimmed);
       } else {
         result.push(`<p class="mb-4 text-muted-foreground leading-relaxed">${trimmed}</p>`);
