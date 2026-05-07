@@ -12,16 +12,19 @@ import SiteHeader from "@/components/SiteHeader.astro";
     <section class="gradient-hero pt-24 pb-12 sm:pt-28 sm:pb-16">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl">
-          {/* Eyebrow — three stacked lines, generous size */}
+          {/* Eyebrow — Southwestern College above, programs in gradient on one line */}
           <div class="mb-8 space-y-1.5">
             <p class="text-primary font-bold tracking-wider uppercase text-base sm:text-lg">
               Southwestern College
             </p>
-            <p class="text-foreground font-semibold text-base sm:text-lg">
-              Recording Arts &amp; Technology
-            </p>
-            <p class="text-foreground font-semibold text-base sm:text-lg">
-              Film, Television &amp; Media Arts
+            <p class="font-semibold text-base sm:text-lg leading-snug">
+              <span class="bg-gradient-to-r from-primary via-amber-300 to-foreground bg-clip-text text-transparent">
+                Recording Arts &amp; Technology
+              </span>
+              <span class="text-muted-foreground/70 mx-2">·</span>
+              <span class="bg-gradient-to-r from-foreground via-amber-300 to-primary bg-clip-text text-transparent">
+                Film, Television &amp; Media Arts
+              </span>
             </p>
           </div>
 
