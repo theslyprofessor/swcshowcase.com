@@ -25,6 +25,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     genre: "",
     estimatedLength: "",
     mediaLinks: "",
+    visualMedia: "",
     equipmentNeeds: "",
     timingPreference: "no_preference" as "earlier" | "later" | "no_preference",
     additionalNotes: "",
@@ -317,6 +318,30 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         />
         <p className="text-xs text-muted-foreground mt-1">
           Share a link so we can preview your submission
+        </p>
+      </div>
+
+      {/* Visual Media for audio-only submissions */}
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
+        <label className="block text-sm font-medium mb-1.5">
+          Visual Component <span className="text-muted-foreground">(audio-only submissions)</span>
+        </label>
+        <p className="text-xs text-muted-foreground mb-2">
+          If your piece is <strong>audio only</strong> (no live performance, no film), please provide an image or visual to accompany it on the screen during your set. Options:
+        </p>
+        <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
+          <li>Link to an image (album art, photo, etc.)</li>
+          <li>Link to a visualizer video</li>
+          <li>A visualizer baked into your audio file (just say so below)</li>
+        </ul>
+        <input
+          value={form.visualMedia}
+          onChange={(e) => update("visualMedia", e.target.value)}
+          className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Image URL, visualizer link, or 'baked into the audio file'"
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Skip if you have a live performance or film component.
         </p>
       </div>
 
