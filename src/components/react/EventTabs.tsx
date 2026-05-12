@@ -1,4 +1,12 @@
 import { useState, useEffect } from "react";
+import LiveScheduleEmbed from "./LiveScheduleEmbed";
+
+// Map tab slug → eventSlug for the dynamic schedule embed. When a tab
+// has an entry here, the live program order is rendered below the
+// article markdown content.
+const SCHEDULE_EMBEDS: Record<string, string> = {
+  "media-showcase-2026-schedule": "media-showcase-2026",
+};
 
 interface Tab {
   slug: string;
@@ -172,6 +180,9 @@ export default function EventTabs({ tabs }: EventTabsProps) {
         </h2>
       )}
       <div dangerouslySetInnerHTML={{ __html: renderMarkdown(activeTab.content) }} />
+      {SCHEDULE_EMBEDS[activeTab.slug] && (
+        <LiveScheduleEmbed eventSlug={SCHEDULE_EMBEDS[activeTab.slug]} />
+      )}
     </div>
   );
 }
