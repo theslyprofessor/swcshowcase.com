@@ -21,9 +21,13 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     classes: "",
     section: "",
     title: "",
+    bandName: "",
     description: "",
+    programNotes: "",
     genre: "",
     estimatedLength: "",
+    durationMin: "",
+    durationSec: "",
     mediaLinks: "",
     visualMedia: "",
     equipmentNeeds: "",
@@ -31,6 +35,10 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     additionalNotes: "",
     createAccount: false,
   });
+
+  const [creators, setCreators] = useState<{ name: string; role: string }[]>([
+    { name: "", role: "" },
+  ]);
 
   const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -41,12 +49,58 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     setError("");
 
     try {
+      // Pack structured min/sec into a single estimatedMinutes number and a
+      // matching display string. The Convex mutation accepts both — the
+      // structured number wins downstream when upserting a cue.
+      const mNum = parseInt(form.durationMin || "0", 10) || 0;
+      const sNum = Math.min(59, Math.max(0, parseInt(form.durationSec || "0", 10) || 0));
+      const estimatedMinutes =
+        mNum + sNum / 60 > 0 ? mNum + sNum / 60 : undefined;
+      const estimatedLength =
+        estimatedMinutes !== undefined
+          ? sNum === 0
+            ? `${mNum} min`
+            : `${mNum}:${sNum.toString().padStart(2, "0")}`
+          : form.estimatedLength || undefined;
+
+      // Don't ship the local-only fields to Convex; assemble exactly what
+      // submitToEvent expects.
+      const { durationMin: _dm, durationSec: _ds, ...rest } = form;
+      void _dm;
+      void _ds;
+      const cleanedCreators = creators
+        .map((c) => ({
+          name: c.name.trim(),
+          role: c.role.trim() || undefined,
+        }))
+        .filter((c) => c.name.length > 0);
+      // If the submitter didn't add anyone, seed creators with their own
+      // name so the program isn't blank. They can rename in the dashboard.
+      const finalCreators =
+        cleanedCreators.length > 0
+          ? cleanedCreators
+          : form.firstName.trim() || form.lastName.trim()
+            ? [
+                {
+                  name: `${form.firstName} ${form.lastName}`.trim(),
+                  role: undefined,
+                },
+              ]
+            : undefined;
+      const args = {
+        ...rest,
+        eventSlug,
+        estimatedLength,
+        estimatedMinutes,
+        creators: finalCreators,
+      };
+
       const res = await fetch(`${CONVEX_URL}/api/mutation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           path: "events:submitToEvent",
-          args: { ...form, eventSlug },
+          args,
           format: "json",
         }),
       });
@@ -255,23 +309,97 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
       </div>
 
-      {/* Title */}
+      {/* Title + Band/Group name */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1.5">
+            Title of Your Piece / Presentation
+          </label>
+          <input
+            value={form.title}
+            onChange={(e) => update("title", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="What's the name of your piece?"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">
+            Band / Group Name <span className="text-muted-foreground">(optional)</span>
+          </label>
+          <input
+            value={form.bandName}
+            onChange={(e) => update("bandName", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="e.g. Suzie's Casket"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            If you're submitting on behalf of a band or group, put the group's
+            name here. We'll list the group on the program — not you.
+          </p>
+        </div>
+      </div>
+
+      {/* Creators / contributors */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Title of Your Piece / Presentation
+          Creators / Contributors
         </label>
-        <input
-          value={form.title}
-          onChange={(e) => update("title", e.target.value)}
-          className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="What's the name of your piece?"
-        />
+        <p className="text-xs text-muted-foreground mb-2">
+          Who worked on this? Include everyone who should be credited on the
+          program. Role is optional (e.g. director, vocals, piano, mix).
+        </p>
+        <div className="space-y-2">
+          {creators.map((c, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                value={c.name}
+                onChange={(e) => {
+                  const next = [...creators];
+                  next[i] = { ...next[i], name: e.target.value };
+                  setCreators(next);
+                }}
+                placeholder="Name"
+                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <input
+                value={c.role}
+                onChange={(e) => {
+                  const next = [...creators];
+                  next[i] = { ...next[i], role: e.target.value };
+                  setCreators(next);
+                }}
+                placeholder="Role (optional)"
+                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const next = creators.filter((_, j) => j !== i);
+                  setCreators(next.length > 0 ? next : [{ name: "", role: "" }]);
+                }}
+                aria-label="Remove"
+                className="px-2 py-2 text-muted-foreground hover:text-destructive"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setCreators([...creators, { name: "", role: "" }])
+            }
+            className="text-sm px-3 py-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary/80"
+          >
+            + Add creator
+          </button>
+        </div>
       </div>
 
       {/* Description */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Description *
+          Description <span className="text-muted-foreground">(internal — for us)</span> *
         </label>
         <textarea
           required
@@ -281,6 +409,28 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder="Tell us about your work — what's it about, what inspired it, what should the audience know going in? Plain language is fine, no need to be polished."
         />
+        <p className="text-xs text-muted-foreground mt-1">
+          This is for the curator team's reference. For the audience-facing
+          blurb, use Program Notes below.
+        </p>
+      </div>
+
+      {/* Program Notes */}
+      <div>
+        <label className="block text-sm font-medium mb-1.5">
+          Program Notes <span className="text-muted-foreground">(shown to the audience)</span>
+        </label>
+        <textarea
+          value={form.programNotes}
+          onChange={(e) => update("programNotes", e.target.value)}
+          rows={3}
+          className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
+          placeholder="A short blurb the audience reads under your title on the program — 1 to 3 short paragraphs. Concert-program style."
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Examples: a story behind the piece, what to listen for, a dedication.
+          Skip if you'd rather we use your description.
+        </p>
       </div>
 
       {/* Genre + Length */}
@@ -296,12 +446,32 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5">Estimated Length</label>
-          <input
-            value={form.estimatedLength}
-            onChange={(e) => update("estimatedLength", e.target.value)}
-            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. 5 minutes, 10-15 minutes"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min={0}
+              max={120}
+              value={form.durationMin}
+              onChange={(e) => update("durationMin", e.target.value)}
+              className="w-24 bg-secondary border border-border rounded-lg px-3 py-2.5 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="0"
+            />
+            <span className="text-sm text-muted-foreground">min</span>
+            <span className="text-muted-foreground">:</span>
+            <input
+              type="number"
+              min={0}
+              max={59}
+              value={form.durationSec}
+              onChange={(e) => update("durationSec", e.target.value)}
+              className="w-24 bg-secondary border border-border rounded-lg px-3 py-2.5 text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="0"
+            />
+            <span className="text-sm text-muted-foreground">sec</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            How long is your piece? (Best guess is fine.)
+          </p>
         </div>
       </div>
 
