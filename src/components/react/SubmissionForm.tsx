@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const CONVEX_URL = "https://amiable-moose-236.convex.cloud";
 
@@ -39,6 +39,20 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
   const [creators, setCreators] = useState<{ name: string; role: string }[]>([
     { name: "", role: "" },
   ]);
+  // Mirror submitter name into creators[0] until the user manually edits
+  // that first row. Lets the contributor list prefill naturally as the
+  // submitter types their own name elsewhere in the form.
+  const [autoMirrorFirstCreator, setAutoMirrorFirstCreator] = useState(true);
+
+  useEffect(() => {
+    if (!autoMirrorFirstCreator) return;
+    const full = `${form.firstName} ${form.lastName}`.trim();
+    setCreators((prev) => {
+      if (prev.length === 0) return [{ name: full, role: "" }];
+      if (prev[0].name === full) return prev;
+      return [{ ...prev[0], name: full }, ...prev.slice(1)];
+    });
+  }, [form.firstName, form.lastName, autoMirrorFirstCreator]);
 
   const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -309,6 +323,71 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
       </div>
 
+      {/* Contributors — moved to the top of the substantive content so the
+          submitter sees right away that this is a credits-driven form.
+          First row auto-mirrors firstName/lastName above until manually edited. */}
+      <div>
+        <label className="block text-sm font-medium mb-1.5">
+          Contributors
+        </label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Who worked on this? List everyone who should be credited on the
+          program. Role is optional (e.g. filmmaker, vocals, piano, mix).
+          We'll prefill the first row with your name — edit if you want to
+          credit yourself differently or add others.
+        </p>
+        <div className="space-y-2">
+          {creators.map((c, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                value={c.name}
+                onChange={(e) => {
+                  // User manually edited the first-row name; stop mirroring
+                  // from firstName/lastName so we don't fight them.
+                  if (i === 0) setAutoMirrorFirstCreator(false);
+                  const next = [...creators];
+                  next[i] = { ...next[i], name: e.target.value };
+                  setCreators(next);
+                }}
+                placeholder={i === 0 ? "Your name (auto-filled from above)" : "Name"}
+                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <input
+                value={c.role}
+                onChange={(e) => {
+                  const next = [...creators];
+                  next[i] = { ...next[i], role: e.target.value };
+                  setCreators(next);
+                }}
+                placeholder="Role (optional)"
+                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (i === 0) setAutoMirrorFirstCreator(false);
+                  const next = creators.filter((_, j) => j !== i);
+                  setCreators(next.length > 0 ? next : [{ name: "", role: "" }]);
+                }}
+                aria-label="Remove"
+                className="px-2 py-2 text-muted-foreground hover:text-destructive"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setCreators([...creators, { name: "", role: "" }])
+            }
+            className="text-sm px-3 py-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary/80"
+          >
+            + Add contributor
+          </button>
+        </div>
+      </div>
+
       {/* Title + Band/Group name */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -336,63 +415,6 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             If you're submitting on behalf of a band or group, put the group's
             name here. We'll list the group on the program — not you.
           </p>
-        </div>
-      </div>
-
-      {/* Creators / contributors */}
-      <div>
-        <label className="block text-sm font-medium mb-1.5">
-          Creators / Contributors
-        </label>
-        <p className="text-xs text-muted-foreground mb-2">
-          Who worked on this? Include everyone who should be credited on the
-          program. Role is optional (e.g. director, vocals, piano, mix).
-        </p>
-        <div className="space-y-2">
-          {creators.map((c, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                value={c.name}
-                onChange={(e) => {
-                  const next = [...creators];
-                  next[i] = { ...next[i], name: e.target.value };
-                  setCreators(next);
-                }}
-                placeholder="Name"
-                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                value={c.role}
-                onChange={(e) => {
-                  const next = [...creators];
-                  next[i] = { ...next[i], role: e.target.value };
-                  setCreators(next);
-                }}
-                placeholder="Role (optional)"
-                className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const next = creators.filter((_, j) => j !== i);
-                  setCreators(next.length > 0 ? next : [{ name: "", role: "" }]);
-                }}
-                aria-label="Remove"
-                className="px-2 py-2 text-muted-foreground hover:text-destructive"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() =>
-              setCreators([...creators, { name: "", role: "" }])
-            }
-            className="text-sm px-3 py-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary/80"
-          >
-            + Add creator
-          </button>
         </div>
       </div>
 
@@ -436,12 +458,12 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       {/* Genre + Length */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1.5">Genre / Format</label>
+          <label className="block text-sm font-medium mb-1.5">Genre</label>
           <input
             value={form.genre}
             onChange={(e) => update("genre", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. Hip-hop beat set, Film score, Live band"
+            placeholder="e.g. Romance, Hip-hop, Film score, Drama, Indie rock"
           />
         </div>
         <div>
