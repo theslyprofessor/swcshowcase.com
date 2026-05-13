@@ -78,12 +78,18 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     }
 
     try {
+      // confirmedSignUpGenius is a client-only validation flag (used above to
+      // gate ushers behind SignUpGenius). The Convex mutation's args
+      // validator is strict — sending an unrecognized field is what was
+      // throwing the opaque "Server Error". Strip it before send.
+      const { confirmedSignUpGenius: _csg, ...mutationArgs } = form;
+      void _csg;
       const res = await fetch(`${CONVEX_URL}/api/mutation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           path: "events:volunteerForEvent",
-          args: { ...form, eventSlug },
+          args: { ...mutationArgs, eventSlug },
           format: "json",
         }),
       });
