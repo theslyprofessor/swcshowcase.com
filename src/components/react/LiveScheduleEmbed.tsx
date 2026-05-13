@@ -12,10 +12,13 @@
  * heads-up) while swcshowcase.com is audience-facing typography. Same
  * data, different render conventions.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const CONVEX_URL = "https://amiable-moose-236.convex.cloud";
-const POLL_INTERVAL_MS = 15_000;
+// Poll cadence: 5s is the sweet spot for "feels live" without hammering
+// Convex. Cues advance every ~3–8 min during a show, so 5s lag is barely
+// perceptible. Bumped down from 15s on user feedback during dress run.
+const POLL_INTERVAL_MS = 5_000;
 
 type Creator = { name: string; role?: string };
 type Cue = {
@@ -160,6 +163,11 @@ interface Props {
 export default function LiveScheduleEmbed({ eventSlug }: Props) {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
+  // Refs for the scrollable container + each row so the current cue can be
+  // snapped to the top of the visible area when it changes (mirrors the
+  // behavior of midimaze.com/admin/events Program View).
+  const listScrollRef = useRef<HTMLDivElement | null>(null);
+  const rowRefs = useRef<Record<number, HTMLLIElement | null>>({});
 
   useEffect(() => {
     let alive = true;
@@ -234,6 +242,15 @@ export default function LiveScheduleEmbed({ eventSlug }: Props) {
         Updates live as the show runs. Times reflect the projected schedule;
         actual times shift once cues are marked started by the stage manager.
       </p>
+      <ScrollToNow
+        listScrollRef={listScrollRef}
+        rowRefs={rowRefs}
+        nowOrder={nowOrder}
+      />
+      <div
+        ref={listScrollRef}
+        className="max-h-[calc(100vh-280px)] overflow-y-auto pr-2 scroll-smooth"
+      >
       <ol className="space-y-6">
         {cuesWithStart.map((c) => {
           const catKey = inferCategory(c);
@@ -247,6 +264,9 @@ export default function LiveScheduleEmbed({ eventSlug }: Props) {
           return (
             <li
               key={c.order}
+              ref={(el) => {
+                rowRefs.current[c.order] = el;
+              }}
               className={`grid grid-cols-[1fr_auto] gap-x-4 items-baseline ${
                 isDone ? "opacity-40" : ""
               }`}
@@ -306,6 +326,34 @@ export default function LiveScheduleEmbed({ eventSlug }: Props) {
           );
         })}
       </ol>
+      </div>
     </div>
   );
+}
+
+/** Companion effect: when the now-cue changes, scroll that row to the top
+ * of the scroll container with smooth behavior. Past cues remain in the
+ * DOM and scroll out above; the audience can scroll back if curious. */
+function ScrollToNow({
+  listScrollRef,
+  rowRefs,
+  nowOrder,
+}: {
+  listScrollRef: React.MutableRefObject<HTMLDivElement | null>;
+  rowRefs: React.MutableRefObject<Record<number, HTMLLIElement | null>>;
+  nowOrder: number | null;
+}) {
+  useEffect(() => {
+    if (nowOrder === null) return;
+    const row = rowRefs.current[nowOrder];
+    const container = listScrollRef.current;
+    if (!row || !container) return;
+    const rowRect = row.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    container.scrollTo({
+      top: container.scrollTop + (rowRect.top - containerRect.top) - 4,
+      behavior: "smooth",
+    });
+  }, [nowOrder, listScrollRef, rowRefs]);
+  return null;
 }
