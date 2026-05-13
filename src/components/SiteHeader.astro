@@ -50,16 +50,16 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-md border-b border-border">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center flex-wrap gap-x-0.5 lg:gap-x-1 gap-y-1 min-h-14 py-1.5 pr-2">
-      {/* Logo — only thing on the left */}
-      <a href="/" class="flex items-baseline gap-2 font-bold shrink-0 mr-3">
-        <span class="gradient-text text-3xl">SWC</span>
-        <span class="text-foreground text-lg hidden sm:inline">Media Showcase</span>
+    <div class="flex items-center gap-x-0 h-14 pr-2 overflow-x-auto sm:overflow-visible scrollbar-hide">
+      {/* Logo — compact at all widths so all section pills fit on one line.
+          The full "Media Showcase" wordmark only shows when there's room. */}
+      <a href="/" class="flex items-baseline gap-2 font-bold shrink-0 mr-2">
+        <span class="gradient-text text-2xl lg:text-3xl">SWC</span>
+        <span class="text-foreground text-lg hidden 2xl:inline">Media Showcase</span>
       </a>
 
-      {/* Spacer pushes everything to the right on wide screens; on narrow
-          it does nothing because the row wraps, which is what we want. */}
-      <div class="flex-1 hidden lg:block"></div>
+      {/* Spacer pushes everything to the right. No wrap — pills shrink instead. */}
+      <div class="flex-1"></div>
 
       {/* Section pills (Overview / Tickets / Schedule / Performer Info / Food & Venue) */}
       {sections.map((s) => {
@@ -71,7 +71,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
             data-tab={activePath === 'home' ? s.index : undefined}
             data-section-pill
             class:list={[
-              'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+              'flex items-center gap-1 px-1.5 lg:px-2 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
               isActive
                 ? 'text-primary border-primary'
                 : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -87,7 +87,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/about"
         class:list={[
-          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1 px-1.5 lg:px-2 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'about'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -101,7 +101,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/submit"
         class:list={[
-          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1 px-1.5 lg:px-2 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'submit'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
@@ -115,7 +115,7 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
       <a
         href="/volunteer"
         class:list={[
-          'flex items-center gap-1.5 px-2 lg:px-3 py-2 text-sm lg:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          'flex items-center gap-1 px-1.5 lg:px-2 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
           activePath === 'volunteer'
             ? 'text-primary border-primary'
             : 'text-muted-foreground border-transparent hover:text-foreground',
