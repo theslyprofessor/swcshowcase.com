@@ -33,6 +33,8 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
     equipmentNeeds: "",
     timingPreference: "no_preference" as "earlier" | "later" | "no_preference",
     additionalNotes: "",
+    parentalAdvisory: false,
+    parentalAdvisoryNote: "",
     createAccount: false,
   });
 
@@ -593,6 +595,42 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder="Optional"
         />
+      </div>
+
+      {/* Parental advisory self-declaration */}
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.parentalAdvisory}
+            onChange={(e) => update("parentalAdvisory", e.target.checked)}
+            className="mt-1 accent-amber-500"
+          />
+          <span className="text-sm">
+            <span className="font-medium text-foreground block mb-1">
+              My work contains explicit or mature content (strong language,
+              mature themes) and needs a parental advisory.
+            </span>
+            <span className="text-muted-foreground">
+              This is a family-friendly audience. Flagging your work lets us
+              place it appropriately and give the audience a heads-up.
+            </span>
+          </span>
+        </label>
+        {form.parentalAdvisory && (
+          <div className="mt-3">
+            <label className="block text-sm font-medium mb-1.5">
+              Briefly, what should we flag?{" "}
+              <span className="text-muted-foreground">(optional)</span>
+            </label>
+            <input
+              value={form.parentalAdvisoryNote}
+              onChange={(e) => update("parentalAdvisoryNote", e.target.value)}
+              className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g. explicit lyrics, mature themes"
+            />
+          </div>
+        )}
       </div>
 
       {/* Account opt-in */}

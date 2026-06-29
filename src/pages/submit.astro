@@ -2,6 +2,9 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import SubmissionForm from "@/components/react/SubmissionForm";
 import SiteHeader from "@/components/SiteHeader.astro";
+
+// Flip this to true to reopen the submission form for a future call.
+const SUBMISSIONS_OPEN = false;
 ---
 
 <BaseLayout>
@@ -9,23 +12,65 @@ import SiteHeader from "@/components/SiteHeader.astro";
 
   <main class="pt-24 pb-16 bg-background min-h-screen">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="max-w-2xl mx-auto mb-10 text-center">
-        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
-          <span class="gradient-text">Submit</span>
-          <span class="text-foreground"> Your Work</span>
-        </h1>
-        <p class="text-muted-foreground mb-2">
-          Tell us what you'd like to present at the Media Showcase 2026.
-        </p>
-        <p class="text-sm text-amber-300">
-          Submission deadline: <span class="font-semibold">Sunday, May 10 · 11:59 PM</span>
-        </p>
-        <p class="text-xs text-muted-foreground mt-3">
-          Need event details? <a href="/" class="text-primary hover:underline">See Overview →</a>
-        </p>
-      </div>
+      {SUBMISSIONS_OPEN ? (
+        <>
+          <div class="max-w-2xl mx-auto mb-10 text-center">
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+              <span class="gradient-text">Submit</span>
+              <span class="text-foreground"> Your Work</span>
+            </h1>
+            <p class="text-muted-foreground mb-2">
+              Tell us what you'd like to present at the Media Showcase 2026.
+            </p>
+            <p class="text-sm text-amber-300">
+              Submission deadline: <span class="font-semibold">Sunday, May 10 · 11:59 PM</span>
+            </p>
+            <p class="text-xs text-muted-foreground mt-3">
+              Need event details? <a href="/" class="text-primary hover:underline">See Overview →</a>
+            </p>
+          </div>
 
-      <SubmissionForm client:load eventSlug="media-showcase-2026" />
+          <SubmissionForm client:load eventSlug="media-showcase-2026" />
+        </>
+      ) : (
+        <div class="max-w-2xl mx-auto">
+          <div class="bg-card border border-border rounded-2xl p-8 sm:p-10 text-center">
+            <div class="text-4xl mb-4">🔒</div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+              <span class="gradient-text">Submissions</span>
+              <span class="text-foreground"> Closed</span>
+            </h1>
+            <p class="text-muted-foreground mb-6 leading-relaxed">
+              The submission deadline has passed and showcase curation is now
+              underway. Thank you to everyone who submitted — we can't wait to
+              share what's coming on Wednesday, May 13, 2026.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="https://midimaze.com/events/media-showcase-2026/live-schedule"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+              >
+                See the live schedule →
+              </a>
+              <a
+                href="/"
+                class="inline-flex items-center justify-center gap-2 bg-secondary border border-border font-semibold px-6 py-3 rounded-lg hover:bg-secondary/80 transition-colors"
+              >
+                Event overview
+              </a>
+            </div>
+            <p class="text-xs text-muted-foreground mt-6">
+              Questions? Email{" "}
+              <a href="mailto:info@swcshowcase.com" class="text-primary hover:underline">
+                info@swcshowcase.com
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   </main>
 
@@ -37,6 +82,8 @@ import SiteHeader from "@/components/SiteHeader.astro";
           <span>&copy; {new Date().getFullYear()} Southwestern College</span>
           <span>&middot;</span>
           <a href="/about" class="hover:text-foreground transition-colors">About</a>
+          <span>&middot;</span>
+          <a href="/rules" class="hover:text-foreground transition-colors">Rules</a>
         </div>
         <div class="flex items-center gap-4">
           <a

@@ -1,0 +1,88 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import { fetchArticle } from "@/lib/convex";
+import { renderMarkdown } from "@/lib/markdown";
+
+// ---------------------------------------------------------------------------
+// Build-time fetch from Convex. The article won't exist until the vault is
+// synced, so handle the null case gracefully with a "coming soon" fallback.
+// ---------------------------------------------------------------------------
+let article: Awaited<ReturnType<typeof fetchArticle>> = null;
+let fetchError = "";
+
+try {
+  article = await fetchArticle("media-showcase-2026-rules");
+} catch (e) {
+  fetchError = e instanceof Error ? e.message : "Failed to load rules content";
+  console.error("Convex fetch error:", fetchError);
+}
+
+const title = article?.title ?? "Showcase Rules & Conduct";
+const html = article ? renderMarkdown(article.content) : "";
+---
+
+<BaseLayout
+  title="Rules & Conduct — Media Showcase 2026"
+  description="Behavioral, safety, and conduct rules for performers and presenters at the Media Showcase 2026 at Southwestern College."
+>
+  <SiteHeader activePath="rules" />
+
+  <main class="pt-24 pb-20 bg-background min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-8">
+        <span class="gradient-text">{title}</span>
+      </h1>
+
+      {article ? (
+        <div class="prose-event max-w-3xl" set:html={html} />
+      ) : (
+        <div class="bg-card rounded-xl p-8 border border-border text-center">
+          <p class="text-muted-foreground">Rules coming soon.</p>
+          <p class="text-sm text-muted-foreground mt-2">
+            We're finalizing the showcase rules &amp; conduct guidelines. Please
+            check back shortly, or email{" "}
+            <a href="mailto:info@swcshowcase.com" class="text-primary hover:underline">
+              info@swcshowcase.com
+            </a>{" "}
+            with any questions.
+          </p>
+        </div>
+      )}
+    </div>
+  </main>
+
+  {/* Footer */}
+  <footer class="border-t border-border py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+        <div class="flex items-center gap-2">
+          <span>&copy; {new Date().getFullYear()} Southwestern College</span>
+          <span>&middot;</span>
+          <a href="/about" class="hover:text-foreground transition-colors">About</a>
+          <span>&middot;</span>
+          <a href="/rules" class="hover:text-foreground transition-colors">Rules</a>
+        </div>
+        <div class="flex items-center gap-4">
+          <a
+            href="https://southwesternrecording.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-foreground transition-colors"
+          >
+            southwesternrecording.com
+          </a>
+          <span>&middot;</span>
+          <a
+            href="https://instagram.com/swc.recordingarts"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-foreground transition-colors"
+          >
+            @swc.recordingarts
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>

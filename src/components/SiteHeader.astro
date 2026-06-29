@@ -10,8 +10,9 @@ interface Props {
    *  'submit'    = /submit (submission form)
    *  'about'     = /about
    *  'volunteer' = /volunteer
+   *  'rules'     = /rules (standalone, footer-linked conduct page)
    */
-  activePath: 'home' | 'submit' | 'about' | 'volunteer';
+  activePath: 'home' | 'submit' | 'about' | 'volunteer' | 'rules';
   /** Section pills (only relevant when activePath === 'home' for live tab switching) */
   tabs?: Tab[];
 }
@@ -82,6 +83,20 @@ const eventDefaultActiveIdx = activePath === 'home' ? 0 : -1;
           </a>
         );
       })}
+
+      {/* Rules pill — conduct/performer rules standalone page */}
+      <a
+        href="/rules"
+        class:list={[
+          'flex items-center gap-1 px-1.5 lg:px-2 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors whitespace-nowrap shrink-0 border-b-2 -mb-px',
+          activePath === 'rules'
+            ? 'text-primary border-primary'
+            : 'text-muted-foreground border-transparent hover:text-foreground',
+        ]}
+      >
+        <span>📜</span>
+        <span>Rules</span>
+      </a>
 
       {/* About pill — right before Submit + Volunteer */}
       <a
