@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import OutsidePerformerForm from "@/components/react/OutsidePerformerForm";
+import SiteHeader from "@/components/SiteHeader.astro";
+
+// Fall 2026 cycle. Update the slug + deadline when the cycle rolls over.
+const EVENT_SLUG = "media-showcase-fall-2026";
+const DEADLINE = "Friday, September 18";
+---
+
+<BaseLayout
+  title="Guest Performers — Fall 2026 Media Showcase"
+  description="Register a non-student guest performer for the Fall 2026 Media Showcase at Southwestern College. Required before they can appear."
+>
+  <SiteHeader activePath="performers" />
+
+  <main class="pt-24 pb-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10 max-w-2xl mx-auto">
+        <p class="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+          November 23 &amp; 24, 2026 &middot; Southwestern College Performing Arts Center
+        </p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+          <span class="gradient-text">Guest Performers</span>
+        </h1>
+        <p class="text-muted-foreground">
+          Bringing someone into your act who is not an SWC student? They need to
+          be registered here so the district can start their contract before the
+          showcase.
+        </p>
+      </div>
+
+      <OutsidePerformerForm
+        client:load
+        eventSlug={EVENT_SLUG}
+        deadline={DEADLINE}
+      />
+    </div>
+  </main>
+
+  <footer class="border-t border-border py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+      <span>&copy; {new Date().getFullYear()} Southwestern College</span>
+      <span class="mx-2">&middot;</span>
+      <a href="/about" class="hover:text-foreground transition-colors">About</a>
+      <span class="mx-2">&middot;</span>
+      <a href="/rules" class="hover:text-foreground transition-colors">Rules</a>
+    </div>
+  </footer>
+</BaseLayout>
