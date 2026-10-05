@@ -6,7 +6,7 @@ import { renderMarkdown } from "@/lib/markdown";
 // has an entry here, the live program order is rendered below the
 // article markdown content.
 const SCHEDULE_EMBEDS: Record<string, string> = {
-  "media-showcase-2026-schedule": "media-showcase-2026",
+  "media-showcase-fall-2026-schedule": "media-showcase-fall-2026",
 };
 
 interface Tab {

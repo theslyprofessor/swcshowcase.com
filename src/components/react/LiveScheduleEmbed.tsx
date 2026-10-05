@@ -44,7 +44,7 @@ type Payload = {
   cues: Cue[];
 };
 
-const SHOW_START_MINUTES = 18 * 60; // 6:00 PM
+const SHOW_START_MINUTES = 17 * 60 + 30; // 5:30 PM
 const INTRO_MINUTES = 5;
 
 const CATEGORY_LABEL: Record<string, string> = {

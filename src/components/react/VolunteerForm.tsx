@@ -118,7 +118,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
         <h2 className="text-2xl font-bold mb-3">You're on the list!</h2>
         <p className="text-muted-foreground mb-4">
           Thanks, {form.firstName}. We'll email you with shift details and a
-          briefing in advance of May 13. Day-of contact info will go out the
+          briefing in advance of your show night (November 23 or 24). Day-of contact info will go out the
           week of the show.
         </p>
 

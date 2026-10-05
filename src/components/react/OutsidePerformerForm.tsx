@@ -51,7 +51,7 @@ const inputClass =
 
 export default function OutsidePerformerForm({
   eventSlug,
-  deadline = "Friday, September 18",
+  deadline = "as soon as you know who they are",
 }: OutsidePerformerFormProps) {
   const [submittedByName, setSubmittedByName] = useState("");
   const [submittedByEmail, setSubmittedByEmail] = useState("");
@@ -192,16 +192,17 @@ export default function OutsidePerformerForm({
       <div className="bg-card border border-border rounded-xl p-5 space-y-3">
         <p className="text-sm text-foreground leading-relaxed">
           Anyone performing who is <strong>not a currently enrolled SWC
-          student</strong> has to go through the district contract process
-          before they can appear. That process needs five specific things from
-          each guest, which is what this form collects.
+          student</strong> has to be registered with the district before they can
+          appear. The district sends each guest a release of liability waiver
+          to sign, and needs five specific things to do that, which is what
+          this form collects.
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed">
           Fill in your details once, then add every guest in your act before
-          submitting. Deadline is{" "}
-          <strong className="text-foreground">{deadline}</strong>. There is also
-          a liability waiver each guest signs, which we send to them directly. If
-          your act is all SWC students, you do not need this form at all.
+          submitting. Register them{" "}
+          <strong className="text-foreground">{deadline}</strong>. The waiver
+          goes to each guest directly. If your act is all SWC students, you do
+          not need this form at all.
         </p>
       </div>
 
@@ -284,7 +285,7 @@ export default function OutsidePerformerForm({
               </div>
             </div>
             <p className="text-xs text-muted-foreground -mt-2">
-              Use the name as it appears on their ID. The contract has to match it.
+              Use the name as it appears on their ID. The waiver has to match it.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -340,7 +341,7 @@ export default function OutsidePerformerForm({
             <div className="pt-2">
               <p className="text-sm font-medium mb-1">Their mailing address *</p>
               <p className="text-xs text-muted-foreground mb-3">
-                Required by the district for the contract packet. Only faculty
+                Required by the district for the waiver. Only faculty
                 and the Performing Arts Coordinator can see it.
               </p>
 
@@ -411,7 +412,7 @@ export default function OutsidePerformerForm({
                 placeholder="Example: Perform bass guitar on two songs during the RA&T showcase, attend one rehearsal and the day-of soundcheck."
               />
               <p className="text-xs text-muted-foreground mt-1">
-                One or two sentences. This goes into the contract, so describe
+                One or two sentences. This goes to the district, so describe
                 the actual responsibilities, including rehearsals and soundcheck.
               </p>
             </div>

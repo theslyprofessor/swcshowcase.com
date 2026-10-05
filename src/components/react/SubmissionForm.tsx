@@ -170,7 +170,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
               <span className="font-medium">Account requested.</span> We'll send a sign-in link
               to <span className="font-mono">{form.email}</span> shortly. Once you create your
               midimaze account with this email, you'll be able to view, edit, and track your
-              submission at <span className="font-medium">midimaze.com/events/media-showcase-2026/my-submission</span>.
+              submission at <span className="font-medium">midimaze.com/events/media-showcase-fall-2026/my-submission</span>.
             </p>
           </div>
         )}
@@ -195,7 +195,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             What happens next
           </p>
           <a
-            href="https://midimaze.com/events/media-showcase-2026/my-submission"
+            href="https://midimaze.com/events/media-showcase-fall-2026/my-submission"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-start gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 transition-colors"
@@ -212,7 +212,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             </span>
           </a>
           <a
-            href="https://midimaze.com/events/media-showcase-2026/live-schedule"
+            href="https://midimaze.com/events/media-showcase-fall-2026/live-schedule"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-start gap-3 p-3 rounded-lg bg-secondary/40 border border-border hover:border-primary/40 transition-colors"

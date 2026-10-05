@@ -7,7 +7,7 @@ import { fetchEventTabs } from "@/lib/convex";
 // ---------------------------------------------------------------------------
 // Build-time fetch from Convex (convex-content module)
 // ---------------------------------------------------------------------------
-const FOLDER_PATH = "Academic Resources/Events/Media Showcase 2026";
+const FOLDER_PATH = "Academic Resources/Events/Media Showcase Fall 2026";
 
 // Flip this to true to reopen the submission flow (also flip in submit.astro).
 const SUBMISSIONS_OPEN = false;
@@ -22,8 +22,8 @@ try {
   // event content tabs. Filter both out of the section pills + content.
   tabs = tabs.filter(
     (t) =>
-      t.slug !== "media-showcase-2026-volunteer" &&
-      t.slug !== "media-showcase-2026-rules",
+      t.slug !== "media-showcase-fall-2026-volunteer" &&
+      t.slug !== "media-showcase-fall-2026-rules",
   );
 } catch (e) {
   fetchError = e instanceof Error ? e.message : "Failed to load event content";
@@ -32,8 +32,8 @@ try {
 ---
 
 <BaseLayout
-  title="Event Info — Media Showcase 2026"
-  description="Full event details for the Media Showcase 2026 at Southwestern College."
+  title="Fall 2026 Media Showcase"
+  description="Two nights of student work from Recording Arts & Technology and Film, Television & Media Arts at Southwestern College. November 23 and 24, 2026, 5:30 PM."
 >
   <SiteHeader activePath="home" tabs={tabs} />
 
@@ -55,9 +55,9 @@ try {
                 Performing with someone who is not an SWC student?
               </p>
               <p class="text-sm text-amber-200/90 leading-relaxed">
-                Guest performers need a district contract before they can appear
-                at the Fall showcase. Register each one by
-                <strong class="text-amber-100">Friday, September 18</strong>.
+                Guest performers must be registered so the district can send them a
+                release of liability waiver before show day. Register each one
+                <strong class="text-amber-100">as soon as you know who they are</strong>.
               </p>
               <span class="inline-flex items-center gap-1.5 text-sm font-medium text-amber-300 mt-2 group-hover:underline">
                 Register a guest performer
@@ -93,7 +93,7 @@ try {
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-8 leading-[1.05]">
             <span class="gradient-text">Media</span>
             <span class="text-foreground"> Showcase</span>
-            <span class="text-muted-foreground font-light"> 2026</span>
+            <span class="text-muted-foreground font-light"> Fall 2026</span>
           </h1>
 
           <div class="flex flex-wrap items-center gap-x-8 gap-y-3 text-base sm:text-lg text-muted-foreground">
@@ -101,13 +101,13 @@ try {
               <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
               </svg>
-              <span class="text-foreground font-medium">Wednesday, May 13, 2026</span>
+              <span class="text-foreground font-medium">Mon Nov 23 (RA&amp;T) &middot; Tue Nov 24 (FTMA)</span>
             </div>
             <div class="flex items-center gap-2.5">
               <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Doors 5:45 PM &middot; Show 6:00&ndash;10:00 PM</span>
+              <span>Doors 5:00 PM &middot; Show 5:30 PM both nights</span>
             </div>
             <div class="flex items-center gap-2.5">
               <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -137,7 +137,7 @@ try {
                 </a>
               ) : (
                 <a
-                  href="https://midimaze.com/events/media-showcase-2026/live-schedule"
+                  href="https://midimaze.com/events/media-showcase-fall-2026/live-schedule"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center justify-center gap-2 bg-secondary border border-border text-muted-foreground font-semibold px-7 py-3 rounded-lg hover:text-foreground transition-colors min-w-[14rem]"

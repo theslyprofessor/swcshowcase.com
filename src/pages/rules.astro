@@ -12,7 +12,7 @@ let article: Awaited<ReturnType<typeof fetchArticle>> = null;
 let fetchError = "";
 
 try {
-  article = await fetchArticle("media-showcase-2026-rules");
+  article = await fetchArticle("media-showcase-fall-2026-rules");
 } catch (e) {
   fetchError = e instanceof Error ? e.message : "Failed to load rules content";
   console.error("Convex fetch error:", fetchError);
@@ -23,8 +23,8 @@ const html = article ? renderMarkdown(article.content) : "";
 ---
 
 <BaseLayout
-  title="Rules & Conduct — Media Showcase 2026"
-  description="Behavioral, safety, and conduct rules for performers and presenters at the Media Showcase 2026 at Southwestern College."
+  title="Rules & Conduct — Fall 2026 Media Showcase"
+  description="Behavioral, safety, and conduct rules for performers and presenters at the Fall 2026 Media Showcase at Southwestern College."
 >
   <SiteHeader activePath="rules" />
 
