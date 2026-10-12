@@ -38,38 +38,6 @@ try {
   <SiteHeader activePath="home" tabs={tabs} />
 
   <main>
-    {/* Fall 2026 guest-performer callout — the contract deadline is the reason
-        this sits above the hero. Remove once the window closes. */}
-    <section class="pt-20 sm:pt-24">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <a
-          href="/performers"
-          class="group block bg-amber-500/10 border-2 border-amber-500/40 rounded-xl p-4 sm:p-5 hover:bg-amber-500/15 transition-colors"
-        >
-          <div class="flex items-start gap-3">
-            <svg class="h-6 w-6 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-            </svg>
-            <div class="flex-1">
-              <p class="font-semibold text-amber-300 mb-1">
-                Performing with someone who is not an SWC student?
-              </p>
-              <p class="text-sm text-amber-200/90 leading-relaxed">
-                Guest performers must be registered so the district can send them a
-                release of liability waiver before show day. Register each one
-                <strong class="text-amber-100">as soon as you know who they are</strong>.
-              </p>
-              <span class="inline-flex items-center gap-1.5 text-sm font-medium text-amber-300 mt-2 group-hover:underline">
-                Register a guest performer
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </section>
 
     {/* Hero — shown only when the Overview tab is active (EventTabs toggles via JS) */}
     <section id="event-hero" class="gradient-hero pt-24 pb-4 sm:pt-28 sm:pb-6">
