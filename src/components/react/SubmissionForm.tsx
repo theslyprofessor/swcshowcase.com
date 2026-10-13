@@ -1030,7 +1030,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           {programTrack === "rat"
             ? "Share an audio stream or cloud link so we can preview your music"
             : programTrack === "ftma"
-            ? "Share a link so the film curation team can preview your cut (works-in-progress welcome!)"
+            ? "Share a link so the film curation team can preview your film"
             : "Share a link so we can preview your collaborative submission"}
         </p>
       </div>
@@ -1064,23 +1064,23 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       {programTrack === "ftma" && (
         <div className="rounded-lg border border-primary/30 bg-primary/[0.04] p-4">
           <label className="block text-sm font-medium mb-1.5">
-            Screening Format &amp; Delivery Specs <span className="text-muted-foreground">(Tuesday Cinema Night)</span>
+            Screening Format &amp; Video Quality <span className="text-muted-foreground">(Tuesday Cinema Night)</span>
           </label>
           <p className="text-xs text-muted-foreground mb-2">
-            Tuesday films screen on the main PAC cinema projection. What is your current export status and format?
+            Tuesday films screen on the main PAC cinema projection. What is the video resolution, codec, and audio quality of your file?
           </p>
           <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
-            <li>Work-in-progress cut (final export ready by November 20)</li>
-            <li>Final master ready (1080p or 4K, ProRes / MP4, stereo or 5.1 audio)</li>
+            <li>Resolution and codec: 1080p or 4K (ProRes 422, H.264 / MP4, aspect ratio)</li>
+            <li>Audio track: Stereo or 5.1 surround sound</li>
           </ul>
           <input
             value={form.visualMedia}
             onChange={(e) => update("visualMedia", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. 1080p 24fps stereo MP4, or 'Rough cut - final export by Nov 20'"
+            placeholder="e.g. 1080p 24fps stereo MP4, 4K ProRes 422, 16:9"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Helps projectionists verify aspect ratio and playback requirements in advance.
+            Helps projectionists verify aspect ratio, audio channels, and playback requirements in advance.
           </p>
         </div>
       )}
