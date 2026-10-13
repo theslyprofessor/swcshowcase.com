@@ -31,6 +31,28 @@ export const PROGRAM_TRACKS = [
 
 export type ProgramTrackId = (typeof PROGRAM_TRACKS)[number]["id"];
 
+export interface GuestPerformer {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+}
+
+const emptyGuest = (): GuestPerformer => ({
+  name: "",
+  role: "",
+  email: "",
+  phone: "",
+});
+
+export const VOLUNTEER_ROLES = [
+  { id: "stage_crew", label: "Stage crew, load-in and gear strike" },
+  { id: "audio_tech", label: "Audio cabling, mic placement and stage patching" },
+  { id: "lighting_projection", label: "Lighting, cinema projection and screen assist" },
+  { id: "front_of_house", label: "Front of house, lobby greeting and ushering" },
+  { id: "general_backstage", label: "General backstage runner and artist support" },
+];
+
 interface SubmissionFormProps {
   eventSlug: string;
 }
@@ -43,6 +65,16 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
   const [hasExistingAccount, setHasExistingAccount] = useState(false);
   const [accountRequested, setAccountRequested] = useState(false);
   const [programTrack, setProgramTrack] = useState<ProgramTrackId>("rat");
+
+  const [hasGuests, setHasGuests] = useState(false);
+  const [guests, setGuests] = useState<GuestPerformer[]>([
+    { name: "", role: "", email: "", phone: "" },
+  ]);
+
+  const [wantsToVolunteer, setWantsToVolunteer] = useState(false);
+  const [volunteerDays, setVolunteerDays] = useState<string[]>([]);
+  const [volunteerRoles, setVolunteerRoles] = useState<string[]>([]);
+  const [volunteerNotes, setVolunteerNotes] = useState("");
 
   const [form, setForm] = useState({
     firstName: "",
@@ -96,7 +128,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
 
     try {
       // Pack structured min/sec into a single estimatedMinutes number and a
-      // matching display string. The Convex mutation accepts both — the
+      // matching display string. The Convex mutation accepts both: the
       // structured number wins downstream when upserting a cue.
       const mNum = parseInt(form.durationMin || "0", 10) || 0;
       const sNum = Math.min(59, Math.max(0, parseInt(form.durationSec || "0", 10) || 0));
@@ -121,6 +153,20 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           role: c.role.trim() || undefined,
         }))
         .filter((c) => c.name.length > 0);
+
+      // If outside guests are declared, also include them in the creator list if not already present
+      const validGuests = hasGuests
+        ? guests.filter((g) => g.name.trim().length > 0)
+        : [];
+
+      for (const g of validGuests) {
+        const gName = g.name.trim();
+        const gRole = g.role.trim() ? `${g.role.trim()} (Guest)` : "Guest Performer";
+        if (!cleanedCreators.some((c) => c.name.toLowerCase() === gName.toLowerCase())) {
+          cleanedCreators.push({ name: gName, role: gRole });
+        }
+      }
+
       // If the submitter didn't add anyone, seed creators with their own
       // name so the program isn't blank. They can rename in the dashboard.
       const finalCreators =
@@ -142,12 +188,55 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         : trackTag;
 
       const trackHeader = `Showcase Track: ${track.fullName} (${track.date})`;
-      const finalAdditionalNotes = [
-        trackHeader,
-        form.additionalNotes.trim() ? form.additionalNotes.trim() : null,
-      ]
-        .filter(Boolean)
-        .join("\n\n");
+      const noteBlocks: string[] = [trackHeader];
+
+      if (form.additionalNotes.trim()) {
+        noteBlocks.push(form.additionalNotes.trim());
+      }
+
+      if (hasGuests) {
+        if (validGuests.length > 0) {
+          const guestLines = validGuests.map((g, idx) => {
+            const parts = [`Guest #${idx + 1}: ${g.name.trim()}`];
+            if (g.role.trim()) parts.push(`Role/Instrument: ${g.role.trim()}`);
+            if (g.email.trim()) parts.push(`Email: ${g.email.trim()}`);
+            if (g.phone.trim()) parts.push(`Phone: ${g.phone.trim()}`);
+            return parts.join(" | ");
+          });
+          noteBlocks.push(
+            `--- GUEST PERFORMERS (Non-SWC Students) ---\n${guestLines.join("\n")}\nDistrict waiver registration page: https://swcshowcase.com/performers`
+          );
+        } else {
+          noteBlocks.push(
+            `--- GUEST PERFORMERS ---\nIndicated performing with outside guests (non-SWC).`
+          );
+        }
+      }
+
+      if (wantsToVolunteer) {
+        const dayLabels = volunteerDays.map((d) =>
+          d === "mon"
+            ? "Monday, Nov 23 (RA&T Showcase)"
+            : d === "tue"
+            ? "Tuesday, Nov 24 (FTMA Showcase)"
+            : d
+        );
+        const vParts = [
+          `Days: ${dayLabels.length > 0 ? dayLabels.join(" AND ") : "Flexible / Any Day"}`,
+        ];
+        if (volunteerRoles.length > 0) {
+          const roleLabels = volunteerRoles.map(
+            (r) => VOLUNTEER_ROLES.find((vr) => vr.id === r)?.label ?? r
+          );
+          vParts.push(`Areas: ${roleLabels.join(", ")}`);
+        }
+        if (volunteerNotes.trim()) {
+          vParts.push(`Notes: ${volunteerNotes.trim()}`);
+        }
+        noteBlocks.push(`--- VOLUNTEER REGISTRATION ---\n${vParts.join("\n")}`);
+      }
+
+      const finalAdditionalNotes = noteBlocks.join("\n\n");
 
       const args = {
         ...rest,
@@ -159,6 +248,43 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         estimatedMinutes,
         creators: finalCreators,
       };
+
+      // Trigger background volunteer registration if the submitter opted in
+      if (wantsToVolunteer) {
+        const dayLabels = volunteerDays.map((d) =>
+          d === "mon"
+            ? "Monday, Nov 23 (RA&T Showcase)"
+            : d === "tue"
+            ? "Tuesday, Nov 24 (FTMA Showcase)"
+            : d
+        );
+        const shiftPreference =
+          dayLabels.length === 2
+            ? "Both nights: Monday, Nov 23 & Tuesday, Nov 24"
+            : dayLabels[0] ?? "Flexible";
+        const roleLabels = volunteerRoles.map(
+          (r) => VOLUNTEER_ROLES.find((vr) => vr.id === r)?.label ?? r
+        );
+        fetch(`${CONVEX_URL}/api/mutation`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path: "events:registerVolunteer",
+            args: {
+              firstName: form.firstName.trim(),
+              lastName: form.lastName.trim(),
+              email: form.email.trim(),
+              classes: form.classes ? `${form.classes} [Showcase Submitter]` : "[Showcase Submitter]",
+              shiftPreference,
+              availability: dayLabels.length > 0 ? dayLabels : ["Flexible"],
+              areasOfInterest: roleLabels.length > 0 ? roleLabels : ["General"],
+              additionalNotes: `Registered via piece submission: "${form.title.trim() || "Showcase Piece"}"${volunteerNotes.trim() ? ` | ${volunteerNotes.trim()}` : ""}`,
+              createAccount: true,
+            },
+            format: "json",
+          }),
+        }).catch(() => {});
+      }
 
       const res = await fetch(`${CONVEX_URL}/api/mutation`, {
         method: "POST",
@@ -201,6 +327,48 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           ({selectedTrack.date}) has been received. We'll review it and get back
           to you.
         </p>
+
+        {hasGuests && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 my-4 text-left">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0">🎤</span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">
+                  Guest Performers: District Waiver Required
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  You indicated that outside guests (non-SWC students) are performing or collaborating with you. Each guest must complete the Southwestern College release of liability waiver before they can take the stage or enter backstage areas.
+                </p>
+                <div className="mt-3">
+                  <a
+                    href="/performers"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20"
+                  >
+                    Share Guest Registration Form: swcshowcase.com/performers →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {wantsToVolunteer && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 my-4 text-left">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl shrink-0">🤝</span>
+              <div>
+                <h4 className="font-bold text-foreground text-sm">
+                  Volunteer Interest Registered
+                </h4>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Thank you for volunteering! Your availability has been added to the showcase crew roster. We will reach out with call times and shift assignments as the event approaches.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Clear prompt to log in or create Midimaze account using their SWC email */}
         <div className="bg-gradient-to-br from-primary/15 via-secondary/70 to-secondary/40 rounded-2xl border border-primary/30 p-6 my-6 text-left shadow-lg">
@@ -271,7 +439,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                 Manage your submission
               </span>
               <span className="text-xs text-muted-foreground">
-                Edit your description, swap your media link, or check your status anytime —
+                Edit your description, swap your media link, or check your status anytime:
                 sign in with the same email.
               </span>
             </span>
@@ -288,8 +456,8 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                 Live schedule
               </span>
               <span className="text-xs text-muted-foreground">
-                See the run of show as it gets locked in. Updates in real time
-                — bookmark this page for showtime.
+                See the run of show as it gets locked in. Updates in real time:
+                bookmark this page for showtime.
               </span>
             </span>
           </a>
@@ -445,7 +613,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
       </div>
 
-      {/* Contributors — moved to the top of the substantive content so the
+      {/* Contributors: moved to the top of the substantive content so the
           submitter sees right away that this is a credits-driven form.
           First row auto-mirrors firstName/lastName above until manually edited. */}
       <div>
@@ -462,7 +630,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             : programTrack === "ftma"
             ? "Who worked on this film? List all key crew and cast for the screening guide. Role is optional (e.g. Director, DP / Cinematographer, Editor, Writer, Lead Actor, Sound Designer)."
             : "List everyone who should be credited on the program. Role is optional (e.g. Director, Composer, Sound Designer, Editor, Performer)."}
-          {" "}We'll prefill the first row with your name — edit if you want to
+          {" "}We'll prefill the first row with your name: edit if you want to
           credit yourself differently or add others.
         </p>
         <div className="space-y-2">
@@ -521,6 +689,151 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             + Add contributor
           </button>
         </div>
+      </div>
+
+      {/* Outside Guest Performers Checkbox + Expandable Fields */}
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={hasGuests}
+            onChange={(e) => setHasGuests(e.target.checked)}
+            className="mt-1 accent-primary h-4 w-4 rounded"
+          />
+          <span className="text-sm">
+            <span className="font-semibold text-foreground block mb-0.5">
+              I am performing or collaborating with outside guest performers (non-SWC students)
+            </span>
+            <span className="text-muted-foreground text-xs leading-relaxed">
+              Check this if your band, ensemble, cast, or crew includes anyone who is not currently enrolled at Southwestern College.
+            </span>
+          </span>
+        </label>
+
+        {hasGuests && (
+          <div className="pt-3 border-t border-border/60 space-y-4">
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3.5 text-xs text-amber-200 leading-relaxed">
+              <strong className="text-amber-100 font-semibold block mb-1">
+                District Release of Liability Waiver Required
+              </strong>
+              Anyone appearing on stage or working backstage who is not an SWC student must be cleared in advance. Guests participate as non-paid volunteer performers under student sponsorship. You can list them below, or have them complete the full district release waiver directly at{" "}
+              <a
+                href="/performers"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-medium hover:text-white"
+              >
+                swcshowcase.com/performers
+              </a>.
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                Guest Performers List
+              </p>
+              {guests.map((guest, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-lg bg-secondary/50 border border-border space-y-3 relative"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-primary">
+                      Guest Performer #{idx + 1}
+                    </span>
+                    {guests.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setGuests(guests.filter((_, j) => j !== idx))
+                        }
+                        className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        Remove Guest
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium mb-1">
+                        Legal Full Name *
+                      </label>
+                      <input
+                        value={guest.name}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setGuests((prev) =>
+                            prev.map((g, j) => (j === idx ? { ...g, name: val } : g))
+                          );
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Guest legal name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1">
+                        Role / Instrument
+                      </label>
+                      <input
+                        value={guest.role}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setGuests((prev) =>
+                            prev.map((g, j) => (j === idx ? { ...g, role: val } : g))
+                          );
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="e.g. Bass Guitar, Guest Vocalist, Actor"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1">
+                        Guest Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={guest.email}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setGuests((prev) =>
+                            prev.map((g, j) => (j === idx ? { ...g, email: val } : g))
+                          );
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="guest@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1">
+                        Guest Phone <span className="text-muted-foreground">(optional)</span>
+                      </label>
+                      <input
+                        type="tel"
+                        value={guest.phone}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setGuests((prev) =>
+                            prev.map((g, j) => (j === idx ? { ...g, phone: val } : g))
+                          );
+                        }}
+                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="(619) 555-0123"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => setGuests([...guests, emptyGuest()])}
+                className="text-xs px-3 py-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary/80 font-medium text-foreground"
+              >
+                + Add Another Guest Performer
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Title + Band/Group/Team name */}
@@ -582,10 +895,10 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       <div>
         <label className="block text-sm font-medium mb-1.5">
           {programTrack === "rat"
-            ? "Description of Your Music / Set (internal — for curators) *"
+            ? "Description of Your Music / Set (internal for curators) *"
             : programTrack === "ftma"
-            ? "Film Synopsis & Story (internal — for curators) *"
-            : "Project Description (internal — for curators) *"}
+            ? "Film Synopsis & Story (internal for curators) *"
+            : "Project Description (internal for curators) *"}
         </label>
         <textarea
           required
@@ -595,10 +908,10 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder={
             programTrack === "rat"
-              ? "Tell us about your audio piece or performance — what genre, instrumentation, concept, or inspiration? Plain language is fine, no need to be polished."
+              ? "Tell us about your audio piece or performance: what genre, instrumentation, concept, or inspiration? Plain language is fine, no need to be polished."
               : programTrack === "ftma"
               ? "What is the story or logline of your film? What was the concept, inspiration, or class prompt? What should curators know going in?"
-              : "Tell us about your work — what's it about, what inspired it, and what should curators know going in?"
+              : "Tell us about your work: what is it about, what inspired it, and what should curators know going in?"
           }
         />
         <p className="text-xs text-muted-foreground mt-1">
@@ -623,7 +936,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder={
             programTrack === "rat"
-              ? "A short blurb the audience reads under your title on the program — 1 to 3 short paragraphs. Concert-program style."
+              ? "A short blurb the audience reads under your title on the program (1 to 3 short paragraphs). Concert-program style."
               : programTrack === "ftma"
               ? "A short logline or synopsis that appears in the screening guide under your film title (1 to 2 short paragraphs)."
               : "A short blurb the audience reads under your title on the program."
@@ -859,6 +1172,101 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder="Optional"
         />
+      </div>
+
+      {/* Volunteer Checkbox + Expandable Details */}
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={wantsToVolunteer}
+            onChange={(e) => setWantsToVolunteer(e.target.checked)}
+            className="mt-1 accent-primary h-4 w-4 rounded"
+          />
+          <span className="text-sm">
+            <span className="font-semibold text-foreground block mb-0.5">
+              I would like to volunteer during the showcase
+            </span>
+            <span className="text-muted-foreground text-xs leading-relaxed">
+              Earn lab hours, learn hands-on backstage production, and support your classmates.
+            </span>
+          </span>
+        </label>
+
+        {wantsToVolunteer && (
+          <div className="pt-3 border-t border-border/60 space-y-4">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Which day(s) can you help? *
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { id: "mon", label: "Monday, Nov 23 (RA&T Showcase)" },
+                  { id: "tue", label: "Tuesday, Nov 24 (FTMA Showcase)" },
+                ].map((d) => (
+                  <label
+                    key={d.id}
+                    className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/50 border border-border cursor-pointer hover:bg-secondary/80 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={volunteerDays.includes(d.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVolunteerDays([...volunteerDays, d.id]);
+                        } else {
+                          setVolunteerDays(volunteerDays.filter((x) => x !== d.id));
+                        }
+                      }}
+                      className="accent-primary h-4 w-4 rounded"
+                    />
+                    <span className="text-xs font-medium text-foreground">{d.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Areas of Interest <span className="text-muted-foreground font-normal">(select all that apply)</span>
+              </label>
+              <div className="space-y-1.5">
+                {VOLUNTEER_ROLES.map((r) => (
+                  <label
+                    key={r.id}
+                    className="flex items-center gap-2 text-xs text-foreground cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={volunteerRoles.includes(r.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVolunteerRoles([...volunteerRoles, r.id]);
+                        } else {
+                          setVolunteerRoles(volunteerRoles.filter((x) => x !== r.id));
+                        }
+                      }}
+                      className="accent-primary h-3.5 w-3.5 rounded"
+                    />
+                    <span>{r.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium mb-1">
+                Volunteer Notes or Specific Availability <span className="text-muted-foreground">(optional)</span>
+              </label>
+              <input
+                value={volunteerNotes}
+                onChange={(e) => setVolunteerNotes(e.target.value)}
+                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="e.g. available starting at 3:00 PM for load-in, experienced with live sound cables"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Parental advisory self-declaration */}
