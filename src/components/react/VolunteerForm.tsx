@@ -1,10 +1,27 @@
 import { useState } from "react";
 
 const CONVEX_URL = "https://amiable-moose-236.convex.cloud";
+const SIGNUP_GENIUS_FALL_URL =
+  "https://www.signupgenius.com/go/10C0449AEAF2FA0F4C70-65361906-fall#/";
 
 interface VolunteerFormProps {
   eventSlug: string;
 }
+
+const VOLUNTEER_DATES = [
+  {
+    id: "monday-nov-23",
+    label: "Monday, November 23, 2026",
+    program: "RA&T Media Showcase",
+    detail: "Recording Arts & Technology · Music, audio & live performances",
+  },
+  {
+    id: "tuesday-nov-24",
+    label: "Tuesday, November 24, 2026",
+    program: "FTMA Media Showcase",
+    detail: "Film, Television & Media Arts · Short films & media screenings",
+  },
+];
 
 const TIME_BLOCKS = [
   { value: "10am-12pm", label: "10 AM – 12 PM (gear prep at Recording Arts)" },
@@ -38,6 +55,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     lastName: "",
     email: "",
     classes: "",
+    dates: [] as string[],
     availability: [] as string[],
     areasOfInterest: [] as string[],
     additionalNotes: "",
@@ -50,7 +68,10 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
   const update = (field: string, value: string | boolean) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
-  const toggle = (field: "availability" | "areasOfInterest", value: string) =>
+  const toggle = (
+    field: "dates" | "availability" | "areasOfInterest",
+    value: string,
+  ) =>
     setForm((prev) => ({
       ...prev,
       [field]: prev[field].includes(value)
@@ -62,6 +83,12 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     e.preventDefault();
     setSubmitting(true);
     setError("");
+
+    if (form.dates.length === 0) {
+      setError("Pick at least one date to volunteer (you can select both days).");
+      setSubmitting(false);
+      return;
+    }
 
     if (form.availability.length === 0) {
       setError("Pick at least one time block — even one hour helps.");
@@ -78,12 +105,43 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
     }
 
     try {
-      // confirmedSignUpGenius is a client-only validation flag (used above to
-      // gate ushers behind SignUpGenius). The Convex mutation's args
-      // validator is strict — sending an unrecognized field is what was
-      // throwing the opaque "Server Error". Strip it before send.
-      const { confirmedSignUpGenius: _csg, ...mutationArgs } = form;
-      void _csg;
+      // confirmedSignUpGenius is client-only validation. dates is transformed into
+      // shiftPreference and availability. The Convex mutation schema validates strictly:
+      // only recognized fields are allowed.
+      const dateLabels = form.dates.map((d) => {
+        const match = VOLUNTEER_DATES.find((vd) => vd.id === d);
+        return match ? `${match.label} (${match.program})` : d;
+      });
+
+      const shiftPreference =
+        form.dates.length === 2
+          ? "Both nights: Monday, Nov 23 & Tuesday, Nov 24"
+          : dateLabels[0] ?? "";
+
+      const availabilityWithDates = [
+        ...dateLabels.map((dl) => `Date: ${dl}`),
+        ...form.availability,
+      ];
+
+      const additionalNotesWithDates = [
+        `Volunteer Dates: ${dateLabels.join(" AND ")}`,
+        form.additionalNotes ? form.additionalNotes : null,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
+      const mutationArgs = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        classes: form.classes || undefined,
+        shiftPreference,
+        availability: availabilityWithDates,
+        areasOfInterest: form.areasOfInterest,
+        additionalNotes: additionalNotesWithDates || undefined,
+        createAccount: form.createAccount,
+      };
+
       const res = await fetch(`${CONVEX_URL}/api/mutation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,13 +170,20 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
   };
 
   if (submitted) {
+    const selectedDateSummary =
+      form.dates.length === 2
+        ? "both nights (Monday, November 23 and Tuesday, November 24)"
+        : form.dates[0] === "monday-nov-23"
+        ? "Monday, November 23 (RA&T Showcase)"
+        : "Tuesday, November 24 (FTMA Showcase)";
+
     return (
       <div className="bg-card rounded-xl border border-border p-8 text-center max-w-2xl mx-auto">
         <div className="text-4xl mb-4">🙌</div>
         <h2 className="text-2xl font-bold mb-3">You're on the list!</h2>
         <p className="text-muted-foreground mb-4">
           Thanks, {form.firstName}. We'll email you with shift details and a
-          briefing in advance of your show night (November 23 or 24). Day-of contact info will go out the
+          briefing in advance for {selectedDateSummary}. Day-of contact info will go out the
           week of the show.
         </p>
 
@@ -172,7 +237,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
             , and other shows. Possible extra credit / service hours at your instructor's discretion.
           </p>
           <a
-            href="https://www.signupgenius.com/go/10C0449AEAF2FA0F4C70-62076924-spring#/"
+            href={SIGNUP_GENIUS_FALL_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
@@ -241,6 +306,49 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           placeholder="e.g. RA&T 105, FTMA 111"
         />
+      </div>
+
+      {/* Date selection */}
+      <div>
+        <label className="block text-sm font-medium mb-1.5">
+          Which night(s) can you volunteer? *
+        </label>
+        <p className="text-xs text-muted-foreground mb-3">
+          Select every night you're available. You can volunteer for either night or <strong className="text-foreground">both days</strong>!
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {VOLUNTEER_DATES.map((date) => {
+            const checked = form.dates.includes(date.id);
+            return (
+              <label
+                key={date.id}
+                className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
+                  checked
+                    ? "bg-primary/15 border-primary shadow-sm"
+                    : "bg-secondary/40 border-border hover:bg-secondary/60 hover:border-border/80"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggle("dates", date.id)}
+                  className="mt-1 accent-primary h-4 w-4 rounded"
+                />
+                <div className="flex-1">
+                  <span className="block font-semibold text-foreground text-sm">
+                    {date.label}
+                  </span>
+                  <span className="block text-xs font-medium text-primary mt-0.5">
+                    {date.program}
+                  </span>
+                  <span className="block text-xs text-muted-foreground mt-1 leading-relaxed">
+                    {date.detail}
+                  </span>
+                </div>
+              </label>
+            );
+          })}
+        </div>
       </div>
 
       {/* Availability */}
@@ -329,7 +437,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
               </div>
             </div>
             <a
-              href="https://www.signupgenius.com/go/10C0449AEAF2FA0F4C70-62076924-spring#/"
+              href={SIGNUP_GENIUS_FALL_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-amber-500 text-amber-950 font-semibold px-4 py-2 rounded-lg hover:bg-amber-400 transition-colors text-sm"

@@ -2,6 +2,35 @@ import { useEffect, useState } from "react";
 
 const CONVEX_URL = "https://amiable-moose-236.convex.cloud";
 
+export const PROGRAM_TRACKS = [
+  {
+    id: "rat" as const,
+    shortName: "RA&T Showcase",
+    fullName: "Recording Arts & Technology (RA&T)",
+    date: "Monday, November 23, 2026",
+    time: "5:30 PM",
+    description: "Music productions, audio engineering, live performances, beats, band sets, and sound design.",
+  },
+  {
+    id: "ftma" as const,
+    shortName: "FTMA Showcase",
+    fullName: "Film, Television & Media Arts (FTMA)",
+    date: "Tuesday, November 24, 2026",
+    time: "5:30 PM",
+    description: "Short films, video productions, documentaries, animations, motion graphics, and media screenings.",
+  },
+  {
+    id: "both" as const,
+    shortName: "Both / Collaborative",
+    fullName: "Cross-Program Collaboration",
+    date: "Mon Nov 23 & Tue Nov 24",
+    time: "Coordinated track",
+    description: "Collaborative projects (e.g. film score + screening, multimedia live projects).",
+  },
+];
+
+export type ProgramTrackId = (typeof PROGRAM_TRACKS)[number]["id"];
+
 interface SubmissionFormProps {
   eventSlug: string;
 }
@@ -13,6 +42,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
   const [isSWCEmail, setIsSWCEmail] = useState(false);
   const [hasExistingAccount, setHasExistingAccount] = useState(false);
   const [accountRequested, setAccountRequested] = useState(false);
+  const [programTrack, setProgramTrack] = useState<ProgramTrackId>("rat");
 
   const [form, setForm] = useState({
     firstName: "",
@@ -103,8 +133,25 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                 },
               ]
             : undefined;
+      const track =
+        PROGRAM_TRACKS.find((t) => t.id === programTrack) ?? PROGRAM_TRACKS[0];
+      const trackTag = `[${track.shortName}]`;
+      const finalClasses = form.classes
+        ? `${trackTag} ${form.classes}`.trim()
+        : trackTag;
+
+      const trackHeader = `Showcase Track: ${track.fullName} (${track.date})`;
+      const finalAdditionalNotes = [
+        trackHeader,
+        form.additionalNotes.trim() ? form.additionalNotes.trim() : null,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+
       const args = {
         ...rest,
+        classes: finalClasses,
+        additionalNotes: finalAdditionalNotes || undefined,
         eventSlug,
         estimatedLength,
         estimatedMinutes,
@@ -139,13 +186,18 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
   };
 
   if (submitted) {
+    const selectedTrack =
+      PROGRAM_TRACKS.find((t) => t.id === programTrack) ?? PROGRAM_TRACKS[0];
+
     return (
       <div className="bg-card rounded-xl border border-border p-8 text-center max-w-2xl mx-auto">
         <div className="text-4xl mb-4">🎉</div>
         <h2 className="text-2xl font-bold mb-3">Submission Received!</h2>
         <p className="text-muted-foreground mb-4">
-          Thank you, {form.firstName}! Your submission for the Media Showcase has been received.
-          We'll review it and get back to you.
+          Thank you, {form.firstName}! Your submission for the{" "}
+          <strong className="text-foreground">{selectedTrack.fullName}</strong>{" "}
+          ({selectedTrack.date}) has been received. We'll review it and get back
+          to you.
         </p>
 
         {accountRequested && hasExistingAccount && (
@@ -293,6 +345,51 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </p>
       </div>
 
+      {/* Program / Showcase Track Selection */}
+      <div>
+        <label className="block text-sm font-medium mb-1.5">
+          Showcase Program &amp; Track *
+        </label>
+        <p className="text-xs text-muted-foreground mb-3">
+          Select which showcase track this piece is for (RA&amp;T, FTMA, or a joint collaboration):
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {PROGRAM_TRACKS.map((track) => {
+            const isSelected = programTrack === track.id;
+            return (
+              <label
+                key={track.id}
+                className={`flex flex-col p-4 rounded-xl border cursor-pointer transition-all ${
+                  isSelected
+                    ? "bg-primary/15 border-primary shadow-sm ring-1 ring-primary"
+                    : "bg-secondary/40 border-border hover:bg-secondary/60 hover:border-border/80"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <input
+                    type="radio"
+                    name="programTrack"
+                    value={track.id}
+                    checked={isSelected}
+                    onChange={() => setProgramTrack(track.id)}
+                    className="accent-primary h-4 w-4"
+                  />
+                  <span className="font-semibold text-foreground text-sm">
+                    {track.shortName}
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-primary mb-1">
+                  {track.date}
+                </span>
+                <span className="text-xs text-muted-foreground leading-relaxed">
+                  {track.description}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Classes + Section */}
       <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
         <div>
@@ -303,10 +400,20 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             value={form.classes}
             onChange={(e) => update("classes", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. RA&T 105, FTMA 111"
+            placeholder={
+              programTrack === "rat"
+                ? "e.g. RA&T 105, RA&T 120"
+                : programTrack === "ftma"
+                ? "e.g. FTMA 111, FTMA 160"
+                : "e.g. RA&T 105, FTMA 111"
+            }
           />
           <p className="text-xs text-muted-foreground mt-1">
-            What class(es) are you taking in FTMA or RA&amp;T?
+            {programTrack === "rat"
+              ? "What RA&T class(es) are you taking this semester?"
+              : programTrack === "ftma"
+              ? "What FTMA class(es) are you taking this semester?"
+              : "What RA&T and/or FTMA class(es) are you taking?"}
           </p>
         </div>
         <div>
