@@ -139,7 +139,7 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
         availability: availabilityWithDates,
         areasOfInterest: form.areasOfInterest,
         additionalNotes: additionalNotesWithDates || undefined,
-        createAccount: form.createAccount,
+        createAccount: true,
       };
 
       const res = await fetch(`${CONVEX_URL}/api/mutation`, {
@@ -187,43 +187,36 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           week of the show.
         </p>
 
-        {accountRequested && hasExistingAccount && (
-          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
-            <p className="text-sm text-secondary-foreground">
-              <span className="font-medium">Welcome back!</span> We linked this
-              sign-up to your existing midimaze account. Sign in at{" "}
-              <a
-                href="https://midimaze.com/login"
-                className="text-primary hover:underline font-medium"
-              >
-                midimaze.com/login
-              </a>{" "}
-              to track your volunteer status.
-            </p>
+        {/* Clear prompt to log in or create Midimaze account using their SWC email */}
+        <div className="bg-gradient-to-br from-primary/15 via-secondary/70 to-secondary/40 rounded-2xl border border-primary/30 p-6 my-6 text-left shadow-lg">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="text-3xl shrink-0 p-3 bg-primary/20 rounded-xl">
+              🎓
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-foreground mb-1">
+                {hasExistingAccount
+                  ? "Sign In to Your Midimaze Account"
+                  : "Connect with Your SWC Student Account"}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                Connect your volunteer shift using your Southwestern College email (
+                <span className="font-mono text-primary font-medium">{form.email}</span>).
+                Signing in lets you view your assigned shift, schedule updates, and crew notes:
+              </p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a
+                  href={`https://midimaze.com/login?email=${encodeURIComponent(form.email)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-all text-sm shadow-md"
+                >
+                  <span>{hasExistingAccount ? "Sign In to Midimaze →" : "Sign In / Create Account with SWC Email →"}</span>
+                </a>
+              </div>
+            </div>
           </div>
-        )}
-
-        {accountRequested && !hasExistingAccount && (
-          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
-            <p className="text-sm text-secondary-foreground">
-              <span className="font-medium">Account requested.</span> We'll send
-              a sign-in link to <span className="font-mono">{form.email}</span>{" "}
-              shortly. Once your midimaze account is set up you'll be able to
-              track your volunteer shift, see other events, and access shared
-              showcase resources.
-            </p>
-          </div>
-        )}
-
-        {!accountRequested && isSWCEmail && (
-          <div className="bg-secondary rounded-lg p-4 mt-4">
-            <p className="text-sm text-secondary-foreground">
-              SWC student detected — you're eligible for the same
-              behind-the-scenes credit and PA hours that we issue for our
-              regular shows.
-            </p>
-          </div>
-        )}
+        </div>
 
         <div className="mt-6 pt-6 border-t border-border text-left">
           <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-2">
@@ -477,27 +470,6 @@ export default function VolunteerForm({ eventSlug }: VolunteerFormProps) {
           placeholder="Allergies, accessibility needs, prior crew experience, friend you want to be paired with, etc."
         />
       </div>
-
-      {/* Account opt-in */}
-      <label className="flex items-start gap-3 bg-secondary/40 rounded-lg p-4 border border-border cursor-pointer hover:bg-secondary/60 transition-colors">
-        <input
-          type="checkbox"
-          checked={form.createAccount}
-          onChange={(e) => update("createAccount", e.target.checked)}
-          className="mt-1 accent-primary"
-        />
-        <span className="text-sm">
-          <span className="font-medium text-foreground block mb-1">
-            Associate this with a midimaze.com account
-          </span>
-          <span className="text-muted-foreground">
-            Optional. We'll link this sign-up to your existing midimaze account
-            (or send a sign-in link to create one) so you can track your shift
-            and access showcase resources. Your sign-up still goes through
-            either way.
-          </span>
-        </span>
-      </label>
 
       {/* Submit */}
       <button

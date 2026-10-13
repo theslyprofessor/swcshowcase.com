@@ -111,9 +111,10 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
 
       // Don't ship the local-only fields to Convex; assemble exactly what
       // submitToEvent expects.
-      const { durationMin: _dm, durationSec: _ds, ...rest } = form;
+      const { durationMin: _dm, durationSec: _ds, createAccount: _ca, ...rest } = form;
       void _dm;
       void _ds;
+      void _ca;
       const cleanedCreators = creators
         .map((c) => ({
           name: c.name.trim(),
@@ -150,6 +151,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
 
       const args = {
         ...rest,
+        createAccount: true, // Seamlessly link to Midimaze without confusing pre-submission checkbox
         classes: finalClasses,
         additionalNotes: finalAdditionalNotes || undefined,
         eventSlug,
@@ -200,47 +202,58 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           to you.
         </p>
 
-        {accountRequested && hasExistingAccount && (
-          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
-            <p className="text-sm text-secondary-foreground">
-              <span className="font-medium">Welcome back!</span> We linked this submission to
-              your existing midimaze account. Sign in at{" "}
-              <a
-                href="https://midimaze.com/login"
-                className="text-primary hover:underline font-medium"
-              >
-                midimaze.com/login
-              </a>{" "}
-              to view, edit, and track your submission status.
-            </p>
+        {/* Clear prompt to log in or create Midimaze account using their SWC email */}
+        <div className="bg-gradient-to-br from-primary/15 via-secondary/70 to-secondary/40 rounded-2xl border border-primary/30 p-6 my-6 text-left shadow-lg">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="text-3xl shrink-0 p-3 bg-primary/20 rounded-xl">
+              🎓
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-foreground mb-1">
+                {hasExistingAccount
+                  ? "Welcome Back! Sign In with Your SWC Email"
+                  : "Connect with Your SWC Student Account"}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                Log in or create your free account using your student email (
+                <span className="font-mono text-primary font-medium">{form.email}</span>).
+                Connecting your account lets you manage your submission directly:
+              </p>
+              <ul className="text-xs text-muted-foreground space-y-1.5 mb-5">
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  <span><strong>Live Status:</strong> Track review &amp; approval status in real time</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  <span><strong>Edit Anytime:</strong> Update your description, credits, or swap your screener link</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold">✓</span>
+                  <span><strong>Showtime Lineup:</strong> See your call time and confirmed slot in the live run of show</span>
+                </li>
+              </ul>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <a
+                  href={`https://midimaze.com/login?email=${encodeURIComponent(form.email)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-all text-sm shadow-md"
+                >
+                  <span>{hasExistingAccount ? "Sign In to Midimaze →" : "Sign In / Create Account with SWC Email →"}</span>
+                </a>
+                <a
+                  href="https://midimaze.com/events/media-showcase-fall-2026/my-submission"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-secondary border border-border font-medium px-4 py-2.5 rounded-lg hover:bg-secondary/80 transition-colors text-sm text-foreground"
+                >
+                  <span>Go to My Submission</span>
+                </a>
+              </div>
+            </div>
           </div>
-        )}
-
-        {accountRequested && !hasExistingAccount && (
-          <div className="bg-secondary rounded-lg p-4 mt-4 text-left">
-            <p className="text-sm text-secondary-foreground">
-              <span className="font-medium">Account requested.</span> We'll send a sign-in link
-              to <span className="font-mono">{form.email}</span> shortly. Once you create your
-              midimaze account with this email, you'll be able to view, edit, and track your
-              submission at <span className="font-medium">midimaze.com/events/media-showcase-fall-2026/my-submission</span>.
-            </p>
-          </div>
-        )}
-
-        {!accountRequested && isSWCEmail && (
-          <div className="bg-secondary rounded-lg p-4 mt-4">
-            <p className="text-sm text-secondary-foreground">
-              We noticed you're using an SWC email.{" "}
-              <a
-                href="https://midimaze.com"
-                className="text-primary hover:underline font-medium"
-              >
-                Register on Midimaze
-              </a>{" "}
-              for student access to course materials and more.
-            </p>
-          </div>
-        )}
+        </div>
 
         <div className="mt-6 pt-6 border-t border-border text-left space-y-3">
           <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
@@ -437,12 +450,19 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           First row auto-mirrors firstName/lastName above until manually edited. */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Contributors
+          {programTrack === "rat"
+            ? "Musicians, Performers & Audio Crew"
+            : programTrack === "ftma"
+            ? "Film Credits & Key Creative Crew"
+            : "Contributors & Creative Credits"}
         </label>
         <p className="text-xs text-muted-foreground mb-2">
-          Who worked on this? List everyone who should be credited on the
-          program. Role is optional (e.g. filmmaker, vocals, piano, mix).
-          We'll prefill the first row with your name — edit if you want to
+          {programTrack === "rat"
+            ? "Who worked on this piece? List everyone who should be credited on the concert program. Role is optional (e.g. vocals, guitar, mix, producer)."
+            : programTrack === "ftma"
+            ? "Who worked on this film? List all key crew and cast for the screening guide. Role is optional (e.g. Director, DP / Cinematographer, Editor, Writer, Lead Actor, Sound Designer)."
+            : "List everyone who should be credited on the program. Role is optional (e.g. Director, Composer, Sound Designer, Editor, Performer)."}
+          {" "}We'll prefill the first row with your name — edit if you want to
           credit yourself differently or add others.
         </p>
         <div className="space-y-2">
@@ -468,7 +488,13 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                   next[i] = { ...next[i], role: e.target.value };
                   setCreators(next);
                 }}
-                placeholder="Role (optional)"
+                placeholder={
+                  programTrack === "rat"
+                    ? "Role (e.g. Vocals, Guitar, Mix, Producer)"
+                    : programTrack === "ftma"
+                    ? "Role (e.g. Director, DP, Editor, Actor, Writer)"
+                    : "Role (e.g. Director, Composer, Sound, Editor)"
+                }
                 className="flex-1 bg-secondary border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <button
@@ -497,32 +523,57 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
       </div>
 
-      {/* Title + Band/Group name */}
+      {/* Title + Band/Group/Team name */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1.5">
-            Title of Your Piece / Presentation
+            {programTrack === "rat"
+              ? "Title of Your Song / Track / Live Piece *"
+              : programTrack === "ftma"
+              ? "Title of Your Film / Project *"
+              : "Title of Your Piece / Presentation *"}
           </label>
           <input
+            required
             value={form.title}
             onChange={(e) => update("title", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="What's the name of your piece?"
+            placeholder={
+              programTrack === "rat"
+                ? "e.g. Midnight Reverie, Beat Set #3"
+                : programTrack === "ftma"
+                ? "e.g. Echoes of Chula Vista, The Final Cut"
+                : "What's the name of your piece?"
+            }
           />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5">
-            Band / Group Name <span className="text-muted-foreground">(optional)</span>
+            {programTrack === "rat"
+              ? "Band / Artist / Group Name"
+              : programTrack === "ftma"
+              ? "Production Company / Film Team Name"
+              : "Band / Group / Team Name"}{" "}
+            <span className="text-muted-foreground">(optional)</span>
           </label>
           <input
             value={form.bandName}
             onChange={(e) => update("bandName", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. Suzie's Casket"
+            placeholder={
+              programTrack === "rat"
+                ? "e.g. Suzie's Casket, The Jazz Quartet"
+                : programTrack === "ftma"
+                ? "e.g. Room 84 Films, CineSWC"
+                : "e.g. Collective / Team Name"
+            }
           />
           <p className="text-xs text-muted-foreground mt-1">
-            If you're submitting on behalf of a band or group, put the group's
-            name here. We'll list the group on the program — not you.
+            {programTrack === "rat"
+              ? "If you perform under a stage name, alias, or as a band, put it here. We'll list the group on the program."
+              : programTrack === "ftma"
+              ? "If this project was produced by a student crew or production team, list it here for screening program credits."
+              : "If submitting on behalf of a band, group, or crew, put the name here."}
           </p>
         </div>
       </div>
@@ -530,7 +581,11 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       {/* Description */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Description <span className="text-muted-foreground">(internal — for us)</span> *
+          {programTrack === "rat"
+            ? "Description of Your Music / Set (internal — for curators) *"
+            : programTrack === "ftma"
+            ? "Film Synopsis & Story (internal — for curators) *"
+            : "Project Description (internal — for curators) *"}
         </label>
         <textarea
           required
@@ -538,7 +593,13 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           onChange={(e) => update("description", e.target.value)}
           rows={4}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
-          placeholder="Tell us about your work — what's it about, what inspired it, what should the audience know going in? Plain language is fine, no need to be polished."
+          placeholder={
+            programTrack === "rat"
+              ? "Tell us about your audio piece or performance — what genre, instrumentation, concept, or inspiration? Plain language is fine, no need to be polished."
+              : programTrack === "ftma"
+              ? "What is the story or logline of your film? What was the concept, inspiration, or class prompt? What should curators know going in?"
+              : "Tell us about your work — what's it about, what inspired it, and what should curators know going in?"
+          }
         />
         <p className="text-xs text-muted-foreground mt-1">
           This is for the curator team's reference. For the audience-facing
@@ -549,18 +610,31 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       {/* Program Notes */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Program Notes <span className="text-muted-foreground">(shown to the audience)</span>
+          {programTrack === "rat"
+            ? "Concert Program Notes (shown to the audience)"
+            : programTrack === "ftma"
+            ? "Screening Guide Synopsis (shown to the audience)"
+            : "Program Notes (shown to the audience)"}
         </label>
         <textarea
           value={form.programNotes}
           onChange={(e) => update("programNotes", e.target.value)}
           rows={3}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
-          placeholder="A short blurb the audience reads under your title on the program — 1 to 3 short paragraphs. Concert-program style."
+          placeholder={
+            programTrack === "rat"
+              ? "A short blurb the audience reads under your title on the program — 1 to 3 short paragraphs. Concert-program style."
+              : programTrack === "ftma"
+              ? "A short logline or synopsis that appears in the screening guide under your film title (1 to 2 short paragraphs)."
+              : "A short blurb the audience reads under your title on the program."
+          }
         />
         <p className="text-xs text-muted-foreground mt-1">
-          Examples: a story behind the piece, what to listen for, a dedication.
-          Skip if you'd rather we use your description.
+          {programTrack === "rat"
+            ? "Examples: stories behind the track, what to listen for, a dedication. Skip if you'd rather we use your description."
+            : programTrack === "ftma"
+            ? "Audience screening guide blurb: logline, brief synopsis, or filmmaker note. Skip if you'd rather we use your description."
+            : "A short blurb explaining your collaborative work for the audience program guide."}
         </p>
       </div>
 
@@ -572,11 +646,19 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             value={form.genre}
             onChange={(e) => update("genre", e.target.value)}
             className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. Romance, Hip-hop, Film score, Drama, Indie rock"
+            placeholder={
+              programTrack === "rat"
+                ? "e.g. Hip-hop, Jazz, Electronic, Indie Rock, Ambient, R&B, Film Score"
+                : programTrack === "ftma"
+                ? "e.g. Narrative Short, Documentary, Music Video, Animation, Experimental"
+                : "e.g. Film with Live Score, Multimedia Installation, Music Video"
+            }
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">Estimated Length</label>
+          <label className="block text-sm font-medium mb-1.5">
+            {programTrack === "ftma" ? "Total Runtime (TRT)" : "Estimated Length"}
+          </label>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -601,7 +683,11 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             <span className="text-sm text-muted-foreground">sec</span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            How long is your piece? (Best guess is fine.)
+            {programTrack === "rat"
+              ? "How long is your track or live set? (Best guess is fine.)"
+              : programTrack === "ftma"
+              ? "Total runtime (TRT) of your short film or video cut. (Best guess is fine.)"
+              : "How long is your piece? (Best guess is fine.)"}
           </p>
         </div>
       </div>
@@ -609,47 +695,108 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
       {/* Media Links */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Link to Your Work
+          {programTrack === "rat"
+            ? "Link to Audio / Demo / Set Preview"
+            : programTrack === "ftma"
+            ? "Link to Film Screener / Video Preview"
+            : "Link to Project Preview (Video & Audio)"}
         </label>
         <input
           value={form.mediaLinks}
           onChange={(e) => update("mediaLinks", e.target.value)}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="SoundCloud, YouTube, Google Drive link, etc."
+          placeholder={
+            programTrack === "rat"
+              ? "SoundCloud, Google Drive, unlisted YouTube, Dropbox, etc."
+              : programTrack === "ftma"
+              ? "Google Drive, Vimeo (with password if private), unlisted YouTube"
+              : "Google Drive, Vimeo, or YouTube link"
+          }
         />
         <p className="text-xs text-muted-foreground mt-1">
-          Share a link so we can preview your submission
+          {programTrack === "rat"
+            ? "Share an audio stream or cloud link so we can preview your music"
+            : programTrack === "ftma"
+            ? "Share a link so the film curation team can preview your cut (works-in-progress welcome!)"
+            : "Share a link so we can preview your collaborative submission"}
         </p>
       </div>
 
-      {/* Visual Media for audio-only submissions */}
-      <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
-        <label className="block text-sm font-medium mb-1.5">
-          Visual Component <span className="text-muted-foreground">(audio-only submissions)</span>
-        </label>
-        <p className="text-xs text-muted-foreground mb-2">
-          If your piece is <strong>audio only</strong> (no live performance, no film), please provide an image or visual to accompany it on the screen during your set. Options:
-        </p>
-        <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
-          <li>Link to an image (album art, photo, etc.)</li>
-          <li>Link to a visualizer video</li>
-          <li>A visualizer baked into your audio file (just say so below)</li>
-        </ul>
-        <input
-          value={form.visualMedia}
-          onChange={(e) => update("visualMedia", e.target.value)}
-          className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Image URL, visualizer link, or 'baked into the audio file'"
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          Skip if you have a live performance or film component.
-        </p>
-      </div>
+      {/* Visual Component for RA&T vs Delivery Specs for FTMA */}
+      {programTrack === "rat" && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
+          <label className="block text-sm font-medium mb-1.5">
+            Visual Component <span className="text-muted-foreground">(audio-only submissions)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            If your piece is <strong>audio only</strong> (no live performance on stage), please provide an image or visual to accompany it on the cinema screen during your set:
+          </p>
+          <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
+            <li>Link to an image (album art, high-res photo, artwork)</li>
+            <li>Link to a visualizer video</li>
+            <li>A visualizer baked into your audio file (just write "baked in" below)</li>
+          </ul>
+          <input
+            value={form.visualMedia}
+            onChange={(e) => update("visualMedia", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Image URL, visualizer link, or 'baked into the audio file'"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Skip if you have a live performance on stage.
+          </p>
+        </div>
+      )}
+
+      {programTrack === "ftma" && (
+        <div className="rounded-lg border border-primary/30 bg-primary/[0.04] p-4">
+          <label className="block text-sm font-medium mb-1.5">
+            Screening Format &amp; Delivery Specs <span className="text-muted-foreground">(Tuesday Cinema Night)</span>
+          </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            Tuesday films screen on the main PAC cinema projection. What is your current export status and format?
+          </p>
+          <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
+            <li>Work-in-progress cut (final export ready by November 20)</li>
+            <li>Final master ready (1080p or 4K, ProRes / MP4, stereo or 5.1 audio)</li>
+          </ul>
+          <input
+            value={form.visualMedia}
+            onChange={(e) => update("visualMedia", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="e.g. 1080p 24fps stereo MP4, or 'Rough cut - final export by Nov 20'"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Helps projectionists verify aspect ratio and playback requirements in advance.
+          </p>
+        </div>
+      )}
+
+      {programTrack === "both" && (
+        <div className="rounded-lg border border-primary/30 bg-primary/[0.04] p-4">
+          <label className="block text-sm font-medium mb-1.5">
+            Visual &amp; Projection Setup
+          </label>
+          <p className="text-xs text-muted-foreground mb-2">
+            Describe how the visual/film component will be screened alongside the audio:
+          </p>
+          <input
+            value={form.visualMedia}
+            onChange={(e) => update("visualMedia", e.target.value)}
+            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="e.g. Cinema projection video synced with live musicians on stage"
+          />
+        </div>
+      )}
 
       {/* Equipment Needs */}
       <div>
         <label className="block text-sm font-medium mb-1.5">
-          Equipment Needs *
+          {programTrack === "rat"
+            ? "Live Performance & Stage Equipment Needs *"
+            : programTrack === "ftma"
+            ? "Screening Presentation & Filmmaker Q&A Needs *"
+            : "Stage & AV Equipment Needs *"}
         </label>
         <textarea
           required
@@ -657,7 +804,13 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           onChange={(e) => update("equipmentNeeds", e.target.value)}
           rows={2}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
-          placeholder="What equipment do you need for the event? Mics, DI boxes, monitors, etc. Write 'None' if you're self-contained."
+          placeholder={
+            programTrack === "rat"
+              ? "What equipment do you need on stage? Mics, DI boxes, monitors, keyboard stand, etc. Write 'None / Playback only' if your track is just being played back through the PA."
+              : programTrack === "ftma"
+              ? "For Tuesday's screening: will the director or crew do a brief live intro or Q&A on stage? How many stage mics will you need? Write 'None' if standard screening only with no live intro."
+              : "Specify stage mics, instruments, audio inputs, and any special projection/playback equipment."
+          }
         />
       </div>
 
@@ -667,7 +820,11 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           Timing Preference *
         </label>
         <p className="text-xs text-muted-foreground mb-2">
-          Would you prefer to present earlier or later? We can't guarantee your request, but we'll try to accommodate.
+          {programTrack === "rat"
+            ? "Would you prefer to perform earlier or later on Monday night (Nov 23)? We can't guarantee your request, but we'll try to accommodate."
+            : programTrack === "ftma"
+            ? "Would you prefer your screening slot earlier or later on Tuesday night (Nov 24)? We can't guarantee your request, but we'll try to accommodate."
+            : "Would you prefer to present earlier or later in the evening? We can't guarantee your request, but we'll try to accommodate."}
         </p>
         <div className="flex gap-4">
           {[
@@ -739,26 +896,6 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           </div>
         )}
       </div>
-
-      {/* Account opt-in */}
-      <label className="flex items-start gap-3 bg-secondary/40 rounded-lg p-4 border border-border cursor-pointer hover:bg-secondary/60 transition-colors">
-        <input
-          type="checkbox"
-          checked={form.createAccount}
-          onChange={(e) => update("createAccount", e.target.checked)}
-          className="mt-1 accent-primary"
-        />
-        <span className="text-sm">
-          <span className="font-medium text-foreground block mb-1">
-            Create a free midimaze account so I can track and edit my submission
-          </span>
-          <span className="text-muted-foreground">
-            We'll link this submission to your account and send you a sign-in link.
-            You'll be able to update your description, swap your media link, and see your
-            slot once we've finalized the run of show.
-          </span>
-        </span>
-      </label>
 
       {/* Submit */}
       <button
