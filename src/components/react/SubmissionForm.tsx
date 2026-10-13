@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 
 const CONVEX_URL = "https://amiable-moose-236.convex.cloud";
 
+export const SIGNUP_GENIUS_FALL_URL =
+  "https://www.signupgenius.com/go/10C0B48A4AB2DA2F9C16-58740578-pacushering";
+
 export const PROGRAM_TRACKS = [
   {
     id: "rat" as const,
@@ -365,6 +368,21 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   Thank you for volunteering! Your availability has been added to the showcase crew roster. We will reach out with call times and shift assignments as the event approaches.
                 </p>
+                {volunteerRoles.includes("front_of_house") && (
+                  <div className="mt-3 pt-3 border-t border-blue-500/20">
+                    <p className="text-xs text-foreground font-medium mb-2">
+                      Because you selected ushering, please complete the PAC SignUpGenius form to claim your shift:
+                    </p>
+                    <a
+                      href={SIGNUP_GENIUS_FALL_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-950 bg-amber-400 hover:bg-amber-300 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Open PAC SignUpGenius Form →
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1011,7 +1029,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           {programTrack === "rat"
             ? "Link to Audio / Demo / Set Preview"
             : programTrack === "ftma"
-            ? "Link to Film Screener / Video Preview"
+            ? "Link to High-Quality Film Screener / Video Export *"
             : "Link to Project Preview (Video & Audio)"}
         </label>
         <input
@@ -1030,7 +1048,7 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
           {programTrack === "rat"
             ? "Share an audio stream or cloud link so we can preview your music"
             : programTrack === "ftma"
-            ? "Share a link so the film curation team can preview your film"
+            ? "Share a Google Drive, Vimeo (with password if private), or unlisted YouTube link. Please provide your best quality export (1080p or 4K)."
             : "Share a link so we can preview your collaborative submission"}
         </p>
       </div>
@@ -1061,30 +1079,6 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
         </div>
       )}
 
-      {programTrack === "ftma" && (
-        <div className="rounded-lg border border-primary/30 bg-primary/[0.04] p-4">
-          <label className="block text-sm font-medium mb-1.5">
-            Screening Format &amp; Video Quality <span className="text-muted-foreground">(Tuesday Cinema Night)</span>
-          </label>
-          <p className="text-xs text-muted-foreground mb-2">
-            Tuesday films screen on the main PAC cinema projection. What is the video resolution, codec, and audio quality of your file?
-          </p>
-          <ul className="text-xs text-muted-foreground mb-2 list-disc list-inside space-y-0.5">
-            <li>Resolution and codec: 1080p or 4K (ProRes 422, H.264 / MP4, aspect ratio)</li>
-            <li>Audio track: Stereo or 5.1 surround sound</li>
-          </ul>
-          <input
-            value={form.visualMedia}
-            onChange={(e) => update("visualMedia", e.target.value)}
-            className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="e.g. 1080p 24fps stereo MP4, 4K ProRes 422, 16:9"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Helps projectionists verify aspect ratio, audio channels, and playback requirements in advance.
-          </p>
-        </div>
-      )}
-
       {programTrack === "both" && (
         <div className="rounded-lg border border-primary/30 bg-primary/[0.04] p-4">
           <label className="block text-sm font-medium mb-1.5">
@@ -1111,18 +1105,25 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
             ? "Screening Presentation & Filmmaker Q&A Needs *"
             : "Stage & AV Equipment Needs *"}
         </label>
+        <p className="text-xs text-muted-foreground mb-2">
+          {programTrack === "rat"
+            ? "What equipment do you need on stage? Mics, DI boxes, monitors, keyboard stand, etc. Write 'None / Playback only' if your track is just being played back through the PA."
+            : programTrack === "ftma"
+            ? "For Tuesday's screening: will the director or crew do a brief live intro or Q&A on stage? How many stage mics will you need? Write 'None' if standard screening only with no live intro."
+            : "Specify stage mics, instruments, audio inputs, and any special projection/playback equipment."}
+        </p>
         <textarea
           required
           value={form.equipmentNeeds}
           onChange={(e) => update("equipmentNeeds", e.target.value)}
-          rows={2}
+          rows={3}
           className="w-full bg-secondary border border-border rounded-lg px-4 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-y"
           placeholder={
             programTrack === "rat"
-              ? "What equipment do you need on stage? Mics, DI boxes, monitors, keyboard stand, etc. Write 'None / Playback only' if your track is just being played back through the PA."
+              ? "e.g. 2 vocal mics, 1 stereo DI for keyboard, 1 drum monitor (or 'None / Playback only')"
               : programTrack === "ftma"
-              ? "For Tuesday's screening: will the director or crew do a brief live intro or Q&A on stage? How many stage mics will you need? Write 'None' if standard screening only with no live intro."
-              : "Specify stage mics, instruments, audio inputs, and any special projection/playback equipment."
+              ? "e.g. Director and DP will introduce for 2 minutes (2 stage mics), or 'None'"
+              : "e.g. 2 vocal mics, projector connection, DI box"
           }
         />
       </div>
@@ -1247,6 +1248,36 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
                   </label>
                 ))}
               </div>
+
+              {/* SignUpGenius card when ushering is checked */}
+              {volunteerRoles.includes("front_of_house") && (
+                <div className="mt-3 bg-amber-500/10 border border-amber-500/40 rounded-lg p-3.5 space-y-2.5">
+                  <div className="flex items-start gap-2">
+                    <svg className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>
+                    <div className="flex-1 text-xs">
+                      <p className="font-semibold text-amber-300 mb-0.5">
+                        Ushering also requires PAC SignUpGenius
+                      </p>
+                      <p className="text-amber-200/90 leading-relaxed">
+                        All PAC ushers (including for the showcase) must sign up through SignUpGenius to reserve an official shift. Please click below to open that form:
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href={SIGNUP_GENIUS_FALL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-amber-500 text-amber-950 font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-400 transition-colors text-xs"
+                  >
+                    Open SignUpGenius
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </div>
+              )}
             </div>
 
             <div>
