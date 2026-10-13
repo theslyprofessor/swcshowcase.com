@@ -1176,20 +1176,15 @@ export default function SubmissionForm({ eventSlug }: SubmissionFormProps) {
 
       {/* Volunteer Checkbox + Expandable Details */}
       <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-        <label className="flex items-start gap-3 cursor-pointer">
+        <label className="flex items-center gap-3 cursor-pointer">
           <input
             type="checkbox"
             checked={wantsToVolunteer}
             onChange={(e) => setWantsToVolunteer(e.target.checked)}
-            className="mt-1 accent-primary h-4 w-4 rounded"
+            className="accent-primary h-4 w-4 rounded"
           />
-          <span className="text-sm">
-            <span className="font-semibold text-foreground block mb-0.5">
-              I would like to volunteer during the showcase
-            </span>
-            <span className="text-muted-foreground text-xs leading-relaxed">
-              Earn lab hours, learn hands-on backstage production, and support your classmates.
-            </span>
+          <span className="text-sm font-semibold text-foreground">
+            I would like to volunteer during the showcase
           </span>
         </label>
 
